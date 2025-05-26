@@ -1,98 +1,325 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MMChat - Login</title>
-<style>
-  body,html {
-    margin:0; padding:0;
-    height:100vh;
-    display:flex; justify-content:center; align-items:center;
-    background: linear-gradient(135deg, #001F3F, #0074D9);
-    font-family: 'Inter', sans-serif;
-  }
-  .login-box {
-    background:#d1d1d1;
-    border-radius:12px;
-    box-shadow:0 0 15px #0006;
-    padding:2rem;
-    width: 90vw;
-    max-width: 320px;
-    text-align:center;
-  }
-  h1 {
-    margin-bottom:1rem;
-    color:#004b99;
-  }
-  input[type=text] {
-    width: 100%;
-    padding: 0.6rem 0.8rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #999;
-    margin-bottom: 1rem;
-  }
-  label {
-    font-weight: 600;
-    color: #004b99;
-  }
-  input[type=color] {
-    width: 100%;
-    height: 2.5rem;
-    border: none;
-    margin-bottom: 1rem;
-    cursor: pointer;
-  }
-  button {
-    width: 100%;
-    background: #4b82f7;
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-size: 1.1rem;
-    padding: 0.7rem;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background 0.3s;
-  }
-  button:hover {
-    background: #3761c7;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MMChat Simples</title>
+  <style>
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      font-family: 'Inter', sans-serif;
+      background-color: #2f2f2f;
+      color: #000;
+      display: flex; justify-content: center; align-items: center;
+    }
+    .container {
+      width: 480px;
+      height: 90vh;
+      background: #d1d1d1;
+      border-radius: 12px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 15px #0006;
+    }
+    header {
+      background: #4b82f7;
+      color: white;
+      padding: 1rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 12px 12px 0 0;
+    }
+    #modeToggle {
+      cursor: pointer;
+      font-size: 1.2rem;
+      background: none;
+      border: none;
+      color: white;
+    }
+    #chat {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      background: #eee;
+      font-size: 0.95rem;
+      line-height: 1.3rem;
+      color: #000;
+      border-radius: 0 0 0 0;
+    }
+    .msg {
+      margin-bottom: 0.5rem;
+      padding: 0.3rem;
+      border-radius: 6px;
+      position: relative;
+      word-wrap: break-word;
+      background: #fff;
+      cursor: default;
+    }
+    .msg.own {
+      background: #cfe3ff;
+    }
+    .msg.mention {
+      border-left: 4px solid #a9d6ff;
+      background: #e4f0ff;
+    }
+    .msg .header {
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--nick-color);
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+    }
+    .msg .time {
+      font-size: 0.75rem;
+      color: #666;
+      margin-left: 10px;
+    }
+    .msg .text {
+      margin-top: 0.2rem;
+      white-space: pre-wrap;
+    }
+    .msg img, .msg video {
+      max-width: 200px;
+      max-height: 150px;
+      margin-top: 0.3rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #usersList {
+      background: #ccc;
+      max-height: 80px;
+      overflow-y: auto;
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      display: none;
+      border-radius: 0 0 12px 12px;
+    }
+    #usersList.active {
+      display: block;
+    }
+    #form {
+      display: flex;
+      gap: 0.3rem;
+      padding: 0.5rem;
+      background: #4b82f7;
+      border-radius: 0 0 12px 12px;
+    }
+    #inputMessage {
+      flex-grow: 1;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+    button, input[type="file"] {
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #3761c7;
+      color: white;
+      font-weight: 600;
+      padding: 0.4rem 0.8rem;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #2a4ea0;
+    }
+    #fileInput {
+      display: none;
+    }
+    .reactions {
+      position: absolute;
+      right: 6px;
+      bottom: 6px;
+      font-size: 1rem;
+      display: flex;
+      gap: 6px;
+    }
+    .reaction {
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Entrar no MMChat</h1>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Digite seu nick" maxlength="20" required autofocus />
-      <label for="nickColor">Escolha a cor do seu nick</label>
-      <input type="color" id="nickColor" value="#007bff" />
-      <button type="submit">Entrar</button>
+  <div class="container" role="main">
+    <header>
+      <div>MMChat Simples</div>
+      <button id="modeToggle" aria-label="Alternar modo claro/escuro">🌙</button>
+    </header>
+    <div id="chat" aria-live="polite" aria-relevant="additions"></div>
+    <div id="usersList" aria-label="Usuários online"></div>
+    <form id="form" aria-label="Enviar mensagem">
+      <input id="inputMessage" autocomplete="off" aria-label="Mensagem" placeholder="Digite uma mensagem..." maxlength="300" />
+      <button type="button" id="btnFile" title="Enviar arquivo">&#128206;</button>
+      <input type="file" id="fileInput" aria-label="Enviar arquivo" />
+      <button type="submit" aria-label="Enviar mensagem">Enviar</button>
     </form>
   </div>
-<script>
-  const loginForm = document.getElementById('loginForm');
-  const usernameInput = document.getElementById('username');
-  const nickColorInput = document.getElementById('nickColor');
 
-  // Se já tiver salvo, preenche inputs
-  if(localStorage.getItem('mmchat_username')){
-    usernameInput.value = localStorage.getItem('mmchat_username');
-  }
-  if(localStorage.getItem('mmchat_nickColor')){
-    nickColorInput.value = localStorage.getItem('mmchat_nickColor');
-  }
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
 
-  loginForm.addEventListener('submit', e => {
-    e.preventDefault();
-    const username = usernameInput.value.trim() || 'Anônimo';
-    const nickColor = nickColorInput.value || '#007bff';
-    localStorage.setItem('mmchat_username', username);
-    localStorage.setItem('mmchat_nickColor', nickColor);
-    // Redireciona para a sala de chat com parâmetros na URL
-    window.location.href = `chat.html?username=${encodeURIComponent(username)}&color=${encodeURIComponent(nickColor)}`;
-  });
-</script>
+    // Usuário escolhe nome e cor
+    let username = "";
+    let userColor = "#000000";
+
+    while (!username) {
+      username = prompt("Digite seu nome de usuário:");
+    }
+    while (!userColor.match(/^#[0-9a-fA-F]{6}$/)) {
+      userColor = prompt("Escolha a cor do seu nick (formato HEX, ex: #000000):", "#000000");
+    }
+
+    socket.emit("join", { username, color: userColor });
+
+    const chat = document.getElementById("chat");
+    const form = document.getElementById("form");
+    const inputMessage = document.getElementById("inputMessage");
+    const btnFile = document.getElementById("btnFile");
+    const fileInput = document.getElementById("fileInput");
+    const usersList = document.getElementById("usersList");
+    const modeToggle = document.getElementById("modeToggle");
+
+    // Toggle modo claro/escuro simples
+    modeToggle.onclick = () => {
+      if (document.body.style.backgroundColor === "rgb(47, 47, 47)") {
+        document.body.style.backgroundColor = "#eee";
+        chat.style.background = "#fff";
+        modeToggle.textContent = "🌙";
+        chat.style.color = "#000";
+      } else {
+        document.body.style.backgroundColor = "#2f2f2f";
+        chat.style.background = "#eee";
+        modeToggle.textContent = "☀️";
+        chat.style.color = "#000";
+      }
+    };
+
+    // Mostrar usuários online
+    socket.on("users", (users) => {
+      usersList.innerHTML = users.map(u => `<span style="color:${u.color}">${u.username}</span>`).join(", ");
+      usersList.classList.toggle("active", users.length > 0);
+    });
+
+    // Mostrar mensagens
+    socket.on("message", (msg) => {
+      addMessage(msg);
+    });
+
+    // Mensagem de sistema
+    socket.on("systemMessage", (text) => {
+      const div = document.createElement("div");
+      div.className = "msg system";
+      div.textContent = text;
+      div.style.fontStyle = "italic";
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    });
+
+    // Atualizar reações
+    socket.on("reactionUpdate", ({ messageId, emoji }) => {
+      const msgDiv = document.querySelector(`[data-id="${messageId}"]`);
+      if (!msgDiv) return;
+      let reactionsDiv = msgDiv.querySelector(".reactions");
+      if (!reactionsDiv) {
+        reactionsDiv = document.createElement("div");
+        reactionsDiv.className = "reactions";
+        msgDiv.appendChild(reactionsDiv);
+      }
+      const reactionSpan = document.createElement("span");
+      reactionSpan.className = "reaction";
+      reactionSpan.textContent = emoji;
+      reactionsDiv.appendChild(reactionSpan);
+    });
+
+    // Deletar mensagem
+    socket.on("messageDelete", (messageId) => {
+      const msgDiv = document.querySelector(`[data-id="${messageId}"]`);
+      if (msgDiv) {
+        msgDiv.remove();
+      }
+    });
+
+    // Enviar mensagem texto
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const text = inputMessage.value.trim();
+      if (!text) return;
+      socket.emit("message", { text });
+      inputMessage.value = "";
+    });
+
+    // Abrir seletor de arquivo
+    btnFile.onclick = () => fileInput.click();
+
+    // Enviar arquivo base64
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        socket.emit("fileMessage", { file: e.target.result });
+      };
+      reader.readAsDataURL(file);
+      fileInput.value = "";
+    });
+
+    // Função que adiciona mensagem na tela
+    function addMessage(msg) {
+      const div = document.createElement("div");
+      div.className = "msg";
+      div.dataset.id = msg.id;
+      if (msg.username === username) div.classList.add("own");
+
+      // Destacar menção (quando mensagem contém @nome)
+      const mentionRegex = new RegExp(`@${username}`, "i");
+      if (mentionRegex.test(msg.text)) {
+        div.classList.add("mention");
+      }
+
+      div.style.setProperty("--nick-color", msg.color);
+
+      const header = document.createElement("div");
+      header.className = "header";
+      header.innerHTML = `<span>${msg.username}</span><span class="time">${msg.time}</span>`;
+
+      const textDiv = document.createElement("div");
+      textDiv.className = "text";
+
+      if (msg.file) {
+        // Mostrar imagem se for img
+        if (msg.file.startsWith("data:image")) {
+          const img = document.createElement("img");
+          img.src = msg.file;
+          textDiv.appendChild(img);
+        } else {
+          // Link para download
+          const a = document.createElement("a");
+          a.href = msg.file;
+          a.target = "_blank";
+          a.textContent = "Arquivo enviado";
+          textDiv.appendChild(a);
+        }
+        if (msg.text) {
+          const p = document.createElement("p");
+          p.textContent = msg.text;
+          textDiv.appendChild(p);
+        }
+      } else {
+        textDiv.textContent = msg.text;
+      }
+
+      div.appendChild(header);
+      div.appendChild(textDiv);
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
 </body>
 </html>
