@@ -2,99 +2,91 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bem-vindo ao MMChat</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Entrar no MMChat</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      background: #2b2b2b;
-      color: #fff;
+      background: #222;
+      color: #eee;
       font-family: 'Inter', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-image: url('bg-texture.png'); /* opcional: textura de fundo */
-      background-size: cover;
+      margin: 0;
     }
-
-    .container {
-      background: rgba(255, 255, 255, 0.1);
+    main {
+      background: #333;
       padding: 2rem;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      max-width: 400px;
-      width: 90%;
+      border-radius: 10px;
+      width: 320px;
+      box-shadow: 0 0 20px #0008;
       text-align: center;
     }
-
-    input, button {
+    input[type=text] {
       width: 100%;
-      padding: 0.75rem;
-      margin-top: 1rem;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
       border: none;
-      border-radius: 8px;
       font-size: 1rem;
     }
-
-    input[type="text"] {
-      background: #f0f0f0;
-      color: #000;
-    }
-
-    input[type="color"] {
-      padding: 0.4rem;
-      height: 40px;
-    }
-
-    button {
-      background: #444;
-      color: white;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-
-    button:hover {
-      background: #666;
-    }
-
     label {
       display: block;
-      margin-top: 1rem;
-      font-weight: bold;
+      margin-bottom: 0.2rem;
+      font-weight: 600;
       text-align: left;
+    }
+    input[type=color] {
+      width: 100%;
+      height: 40px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 5px;
+      background: #4b82f7;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #3761c7;
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <main>
     <h1>Bem-vindo ao MMChat</h1>
-    <form onsubmit="entrar(event)">
-      <label for="username">Nome de Usuário</label>
-      <input type="text" id="username" placeholder="Digite seu nome" required />
-
-      <label for="nickColor">Cor do Nick</label>
-      <input type="color" id="nickColor" value="#000000" />
-
+    <form id="loginForm">
+      <label for="username">Nome:</label>
+      <input type="text" id="username" placeholder="Digite seu nome" required maxlength="20" />
+      
+      <label for="nickcolor">Cor do Nick:</label>
+      <input type="color" id="nickcolor" value="#007bff" />
+      
       <button type="submit">Entrar</button>
     </form>
-  </div>
+  </main>
 
   <script>
-    function entrar(e) {
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const nome = document.getElementById("username").value.trim();
-      const cor = document.getElementById("nickColor").value;
+      const nome = document.getElementById('username').value.trim();
+      const cor = document.getElementById('nickcolor').value;
       if (nome) {
-        const params = new URLSearchParams();
-        params.set("username", nome);
-        params.set("cor", cor);
-        window.location.href = `sala.html?${params.toString()}`;
+        // Passa nome e cor na query string
+        const url = `sala.html?username=${encodeURIComponent(nome)}&color=${encodeURIComponent(cor)}`;
+        window.location.href = url;
       }
-    }
+    });
   </script>
 </body>
 </html>
