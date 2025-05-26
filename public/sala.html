@@ -1,8 +1,9 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Community Chat</title>
+  <title>Sala - New Community</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
   <style>
     * {
@@ -10,119 +11,279 @@
       padding: 0;
       box-sizing: border-box;
       font-family: 'Inter', sans-serif;
-    }body {
-  background-color: #121212;
-  color: #ffffff;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.chat-header {
-  padding: 1rem;
-  background-color: #1e1e1e;
-  border-bottom: 1px solid #444;
-  text-align: center;
-  font-weight: bold;
-}
-
-#chat {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  background-color: #ccc; /* cinza claro */
-  color: #000;
-}
-
-#chat div {
-  margin-bottom: 0.75rem;
-  line-height: 1.4;
-}
-
-.chat-form {
-  display: flex;
-  flex-direction: column;
-  padding: 0.75rem;
-  background-color: #1e1e1e;
-  gap: 0.5rem;
-}
-
-.chat-form input[type="text"] {
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: none;
-  outline: none;
-  background: #333;
-  color: white;
-}
-
-.chat-form .buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.chat-form button,
-#btnAudio,
-#btnArquivo,
-#btnCor,
-#btnFontes {
-  padding: 0.5rem;
-  border: none;
-  background: #4caf50;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  flex: 1;
-}
-
-select, input[type="file"] {
-  padding: 6px;
-  border-radius: 5px;
-  border: none;
-  background-color: #333;
-  color: white;
-  font-size: 0.9rem;
-}
-
-#usuariosContainer {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 10px;
-  background: #1e1e1e;
-  border: 1px solid #333;
-  padding: 1rem;
-  border-radius: 8px;
-  z-index: 10;
-  width: 80vw;
-  max-width: 250px;
-}
-
-.chat-img {
-  max-width: 100%;
-  border-radius: 6px;
-  margin-top: 5px;
-}
-
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      padding: 1rem;
+      background-color: #1e1e1e;
+      text-align: center;
+      font-weight: bold;
+      position: relative;
+    }
+    #btnToggleUsuarios {
+      position: absolute;
+      left: 10px;
+      top: 1rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .mural {
+      flex: 1;
+      list-style: none;
+      overflow-y: auto;
+      padding: 1rem;
+      background-color: #444;
+    }
+    .mural div {
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .chat-form {
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem;
+      background-color: #1e1e1e;
+      gap: 0.5rem;
+    }
+    .chat-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .chat-form input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      background: #333;
+      color: white;
+    }
+    .chat-form button, .icon-btn {
+      padding: 0.5rem;
+      border: none;
+      background: #4caf50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .icon-btn {
+      background: #555;
+      font-size: 1.2rem;
+    }
+    #usuariosContainer {
+      display: none;
+      background-color: #222;
+      padding: 0.5rem;
+    }
+    #usuariosContainer.active {
+      display: block;
+    }
+    #fontSelect, #colorSelect {
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: white;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    .image-container img {
+      max-width: 100%;
+      margin-top: 5px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
   <div class="chat-header">
+    <button id="btnToggleUsuarios">👥</button>
     New Community
-    <button onclick="toggleUsuarios()">Usuários</button>
-  </div>  <div id="usuariosContainer"></div>
-  <div id="chat"></div>  <form id="form" class="chat-form">
-    <input id="mensagem" type="text" placeholder="Digite sua mensagem..." autocomplete="off" />
-    <div class="buttons">
-      <button type="submit">Enviar</button>
-      <button type="button" id="btnAudio">Microfone</button>
-      <button type="button" id="btnArquivo">Clips</button>
-      <button type="button" id="btnCor">Cor</button>
-      <button type="button" id="btnFontes">Fonte</button>
+  </div>
+  <div id="usuariosContainer"></div>
+  <div id="chat" class="mural"></div>
+
+  <form id="form" class="chat-form">
+    <div class="chat-row">
+      <select id="fontSelect">
+        <option value="Inter">Padrão</option>
+        <option value="Courier New">Mono</option>
+        <option value="Comic Sans MS">Divertida</option>
+        <option value="Times New Roman">Clássica</option>
+        <option value="Arial Black">Negrito</option>
+      </select>
+      <select id="colorSelect">
+        <option value="#ffffff">Branco</option>
+        <option value="#4caf50">Verde</option>
+        <option value="#2196f3">Azul</option>
+        <option value="#ff9800">Laranja</option>
+        <option value="#f44336">Vermelho</option>
+        <option value="#e91e63">Rosa</option>
+      </select>
     </div>
-    <input type="file" id="inputArquivo" accept="image/*,audio/*" style="display:none;" />
-  </form>  <script src="/socket.io/socket.io.js"></script>  <script>
+
+    <div class="chat-row">
+      <input id="mensagem" type="text" placeholder="Digite sua mensagem..." autocomplete="off" />
+      <button type="submit">Enviar</button>
+      <button type="button" id="btnAudio" class="icon-btn">🎤</button>
+      <button type="button" id="btnImagem" class="icon-btn">📎</button>
+      <input type="file" id="inputImagem" style="display: none;" accept="image/*,audio/*" />
+    </div>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const urlParams = new URLSearchParams(window.location.search);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sala - New Community</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      padding: 1rem;
+      background-color: #1e1e1e;
+      text-align: center;
+      font-weight: bold;
+      position: relative;
+    }
+    #btnToggleUsuarios {
+      position: absolute;
+      left: 10px;
+      top: 1rem;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+    }
+    .mural {
+      flex: 1;
+      list-style: none;
+      overflow-y: auto;
+      padding: 1rem;
+      background-color: #444;
+    }
+    .mural div {
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .chat-form {
+      display: flex;
+      flex-direction: column;
+      padding: 0.75rem;
+      background-color: #1e1e1e;
+      gap: 0.5rem;
+    }
+    .chat-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .chat-form input[type="text"] {
+      flex: 1;
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+      background: #333;
+      color: white;
+    }
+    .chat-form button, .icon-btn {
+      padding: 0.5rem;
+      border: none;
+      background: #4caf50;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .icon-btn {
+      background: #555;
+      font-size: 1.2rem;
+    }
+    #usuariosContainer {
+      display: none;
+      background-color: #222;
+      padding: 0.5rem;
+    }
+    #usuariosContainer.active {
+      display: block;
+    }
+    #fontSelect, #colorSelect {
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: white;
+      font-size: 0.9rem;
+      width: 100%;
+    }
+    .image-container img {
+      max-width: 100%;
+      margin-top: 5px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-header">
+    <button id="btnToggleUsuarios">👥</button>
+    New Community
+  </div>
+  <div id="usuariosContainer"></div>
+  <div id="chat" class="mural"></div>
+
+  <form id="form" class="chat-form">
+    <div class="chat-row">
+      <select id="fontSelect">
+        <option value="Inter">Padrão</option>
+        <option value="Courier New">Mono</option>
+        <option value="Comic Sans MS">Divertida</option>
+        <option value="Times New Roman">Clássica</option>
+        <option value="Arial Black">Negrito</option>
+      </select>
+      <select id="colorSelect">
+        <option value="#ffffff">Branco</option>
+        <option value="#4caf50">Verde</option>
+        <option value="#2196f3">Azul</option>
+        <option value="#ff9800">Laranja</option>
+        <option value="#f44336">Vermelho</option>
+        <option value="#e91e63">Rosa</option>
+      </select>
+    </div>
+
+    <div class="chat-row">
+      <input id="mensagem" type="text" placeholder="Digite sua mensagem..." autocomplete="off" />
+      <button type="submit">Enviar</button>
+      <button type="button" id="btnAudio" class="icon-btn">🎤</button>
+      <button type="button" id="btnImagem" class="icon-btn">📎</button>
+      <input type="file" id="inputImagem" style="display: none;" accept="image/*,audio/*" />
+    </div>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
     const socket = io();
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get("username") || "Anônimo";
@@ -130,20 +291,41 @@ select, input[type="file"] {
     const form = document.getElementById("form");
     const input = document.getElementById("mensagem");
     const chat = document.getElementById("chat");
-    const inputArquivo = document.getElementById("inputArquivo");
+    const fontSelect = document.getElementById("fontSelect");
+    const colorSelect = document.getElementById("colorSelect");
+    const btnImagem = document.getElementById("btnImagem");
+    const inputImagem = document.getElementById("inputImagem");
+    const btnToggleUsuarios = document.getElementById("btnToggleUsuarios");
     const usuariosContainer = document.getElementById("usuariosContainer");
+    const btnAudio = document.getElementById("btnAudio");
 
-    let userColor = localStorage.getItem("userColor") || "#000000";
-    let userFont = localStorage.getItem("userFont") || "Inter";
+    fontSelect.value = localStorage.getItem("userFont") || "Inter";
+    colorSelect.value = localStorage.getItem("userColor") || "#ffffff";
 
-    function toggleUsuarios() {
-      usuariosContainer.style.display = usuariosContainer.style.display === 'block' ? 'none' : 'block';
-    }
+    fontSelect.addEventListener("change", () => {
+      localStorage.setItem("userFont", fontSelect.value);
+    });
 
-    document.getElementById("btnArquivo").addEventListener("click", () => inputArquivo.click());
+    colorSelect.addEventListener("change", () => {
+      localStorage.setItem("userColor", colorSelect.value);
+    });
 
-    inputArquivo.addEventListener("change", () => {
-      const file = inputArquivo.files[0];
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const texto = input.value.trim();
+      const fonte = fontSelect.value;
+      const cor = colorSelect.value;
+
+      if (texto) {
+        socket.emit("mensagem", { username, texto, fonte, cor });
+        input.value = "";
+      }
+    });
+
+    btnImagem.addEventListener("click", () => inputImagem.click());
+
+    inputImagem.addEventListener("change", () => {
+      const file = inputImagem.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
@@ -153,29 +335,12 @@ select, input[type="file"] {
       }
     });
 
-    document.getElementById("btnCor").addEventListener("click", () => {
-      const cor = prompt("Digite uma cor hexadecimal:", userColor);
-      if (cor) {
-        userColor = cor;
-        localStorage.setItem("userColor", cor);
-      }
+    btnAudio.addEventListener("click", () => {
+      alert("Função de áudio ainda será implementada.");
     });
 
-    document.getElementById("btnFontes").addEventListener("click", () => {
-      const fonte = prompt("Digite a fonte (ex: 'Courier New', 'Comic Sans MS', 'Times New Roman', 'Arial Black'):", userFont);
-      if (fonte) {
-        userFont = fonte;
-        localStorage.setItem("userFont", fonte);
-      }
-    });
-
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const texto = input.value.trim();
-      if (texto) {
-        socket.emit("mensagem", { username, texto, fonte: userFont, cor: userColor });
-        input.value = "";
-      }
+    btnToggleUsuarios.addEventListener("click", () => {
+      usuariosContainer.classList.toggle("active");
     });
 
     socket.on("mensagem", ({ username: autor, texto, fonte, cor }) => {
@@ -187,17 +352,14 @@ select, input[type="file"] {
 
     socket.on("imagem", ({ username: autor, imagem }) => {
       const div = document.createElement("div");
-      div.innerHTML = `<strong>${autor}:</strong><br><img src="${imagem}" class="chat-img" onclick="this.style.display=this.style.display==='none'?'block':'none';" />`;
+      div.innerHTML = `<strong>${autor}:</strong><br><div class="image-container"><img src="${imagem}" alt="imagem enviada" /></div>`;
       chat.appendChild(div);
       chat.scrollTop = chat.scrollHeight;
     });
 
-    socket.on("usuarios", (lista) => {
-      usuariosContainer.innerHTML = `<strong>Usuários online:</strong><ul>${lista.map(u => `<li>${u}</li>`).join('')}</ul>`;
+    socket.on("usuarios", lista => {
+      usuariosContainer.innerHTML = "<strong>Usuários online:</strong><br>" + lista.map(u => `- ${u}`).join("<br>");
     });
-
-    window.addEventListener("resize", () => {
-      chat.scrollTop = chat.scrollHeight;
-    });
-  </script></body>
-</html>
+  </script>
+</body>
+</html>￼Enter
