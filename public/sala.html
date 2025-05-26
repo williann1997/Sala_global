@@ -1,9 +1,8 @@
-<!-- public/sala.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sala Global</title>
   <style>
     body {
@@ -22,174 +21,41 @@
       justify-content: space-between;
       align-items: center;
     }
+    #container {
+      flex: 1;
+      display: flex;
+      background-color: #121212;
+      overflow: hidden;
+    }
+    #usuarios {
+      width: 200px;
+      border-right: 1px solid #333;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    #usuarios h3 {
+      margin-bottom: 1rem;
+    }
     #chat {
       flex: 1;
       padding: 1rem;
       overflow-y: auto;
-      background-color: #121212;
     }
     #form {
       display: flex;
-      flex-direction: column;
       padding: 1rem;
       background-color: #2a2a2a;
-    }
-    input[type="text"] {
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.75rem;
-      background-color: #4caf50;
-      border: none;
-      border-radius: 4px;
-      color: white;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #gravando {
-      color: red;
-      margin-bottom: 0.5rem;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h2>Sala Global</h2>
-    <span id="usuario"></span>
-  </header>
-  <div id="chat"></div>
-  <div id="form">
-    <div id="gravando" style="display:none;">Gravando áudio...</div>
-    <input id="mensagem" type="text" placeholder="Digite uma mensagem" />
-    <button id="enviar">Enviar Mensagem</button>
-    <button id="gravarAudio">Gravar Áudio</button>
-  </div>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('mensagem');
-    const enviar = document.getElementById('enviar');
-    const gravarBtn = document.getElementById('gravarAudio');
-    const gravando = document.getElementById('gravando');
-    const params = new URLSearchParams(window.location.search);
-    const username = params.get('username') || 'Anônimo';
-
-    document.getElementById('usuario').textContent = username;
-
-    enviar.addEventListener('click', () => {
-      const texto = input.value.trim();
-      if (texto) {
-        socket.emit('mensagem', { tipo: 'texto', autor: username, conteudo: texto });
-        input.value = '';
-      }
-    });
-
-    // Áudio
-    let mediaRecorder;
-    let audioChunks = [];
-
-    gravarBtn.addEventListener('click', async () => {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-        gravando.style.display = 'none';
-        gravarBtn.textContent = 'Gravar Áudio';
-      } else {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
-
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(audioChunks, { type: 'audio/webm' });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            socket.emit('mensagem', { tipo: 'audio', autor: username, conteudo: reader.result });
-          };
-          reader.readAsDataURL(blob);
-        };
-
-        mediaRecorder.start();
-        gravando.style.display = 'block';
-        gravarBtn.textContent = 'Parar Gravação';
-      }
-    });
-
-    // Recebendo mensagens
-    socket.on('mensagem', data => {
-      const msg = document.createElement('div');
-      msg.style.marginBottom = '1rem';
-
-      if (data.tipo === 'texto') {
-        msg.innerHTML = `<strong>${data.autor}:</strong> ${data.conteudo}`;
-      } else if (data.tipo === 'audio') {
-        msg.innerHTML = `<strong>${data.autor}:</strong><br>`;
-        const audio = document.createElement('audio');
-        audio.src = data.conteudo;
-        audio.controls = true;
-        msg.appendChild(audio);
-      }
-
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
-    });
-  </script>
-</body>
-</html><!-- public/sala.html -->
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sala Global</title>
-  <style>
-    body {
-      background-color: #1e1e1e;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      margin: 0;
-    }
-    header {
-      background-color: #2a2a2a;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
       align-items: center;
+      gap: 0.5rem;
     }
-    #chat {
+    #mensagem {
       flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      background-color: #121212;
-    }
-    #form {
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
-      background-color: #2a2a2a;
-    }
-    input[type="text"] {
       padding: 0.75rem;
-      margin-bottom: 0.5rem;
       border: none;
       border-radius: 4px;
       font-size: 1rem;
     }
     button {
-      padding: 0.75rem;
       background-color: #4caf50;
       border: none;
       border-radius: 4px;
@@ -197,13 +63,30 @@
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     button:hover {
       background-color: #45a049;
     }
-    #gravando {
-      color: red;
-      margin-bottom: 0.5rem;
+    #btnAudio {
+      background-color: #444;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      transition: background-color 0.3s;
+    }
+    #btnAudio.gravando {
+      background-color: red;
+    }
+    /* Ícone de microfone simples */
+    #btnAudio svg {
+      fill: white;
+      width: 20px;
+      height: 20px;
     }
   </style>
 </head>
@@ -212,84 +95,140 @@
     <h2>Sala Global</h2>
     <span id="usuario"></span>
   </header>
-  <div id="chat"></div>
-  <div id="form">
-    <div id="gravando" style="display:none;">Gravando áudio...</div>
-    <input id="mensagem" type="text" placeholder="Digite uma mensagem" />
-    <button id="enviar">Enviar Mensagem</button>
-    <button id="gravarAudio">Gravar Áudio</button>
+
+  <div id="container">
+    <aside id="usuarios">
+      <h3>Usuários Online</h3>
+      <ul id="listaUsuarios" style="list-style:none; padding-left:0;"></ul>
+    </aside>
+
+    <main id="chat"></main>
   </div>
+
+  <form id="form">
+    <input id="mensagem" autocomplete="off" placeholder="Digite uma mensagem" />
+    <button type="submit" id="btnEnviar">Enviar</button>
+    <button type="button" id="btnAudio" title="Gravar áudio" aria-label="Gravar áudio">
+      <svg viewBox="0 0 24 24" >
+        <path d="M12 14a2 2 0 0 0 2-2V6a2 2 0 0 0-4 0v6a2 2 0 0 0 2 2zm4-2a4 4 0 0 1-8 0H6a6 6 0 0 0 12 0h-2zm-4 6v3h2v-3h-2z"/>
+      </svg>
+    </button>
+  </form>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const chat = document.getElementById('chat');
-    const input = document.getElementById('mensagem');
-    const enviar = document.getElementById('enviar');
-    const gravarBtn = document.getElementById('gravarAudio');
-    const gravando = document.getElementById('gravando');
+    const listaUsuarios = document.getElementById('listaUsuarios');
+    const inputMsg = document.getElementById('mensagem');
+    const form = document.getElementById('form');
+    const btnAudio = document.getElementById('btnAudio');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const usuarioSpan = document.getElementById('usuario');
+
     const params = new URLSearchParams(window.location.search);
     const username = params.get('username') || 'Anônimo';
 
-    document.getElementById('usuario').textContent = username;
+    usuarioSpan.textContent = username;
 
-    enviar.addEventListener('click', () => {
-      const texto = input.value.trim();
-      if (texto) {
+    // Enviar mensagem texto
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const texto = inputMsg.value.trim();
+      if(texto) {
         socket.emit('mensagem', { tipo: 'texto', autor: username, conteudo: texto });
-        input.value = '';
+        inputMsg.value = '';
+        inputMsg.focus();
       }
     });
 
-    // Áudio
+    // Controle de gravação de áudio
     let mediaRecorder;
     let audioChunks = [];
+    let gravando = false;
 
-    gravarBtn.addEventListener('click', async () => {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
+    btnAudio.addEventListener('click', async () => {
+      if(gravando) {
+        // Parar gravação
         mediaRecorder.stop();
-        gravando.style.display = 'none';
-        gravarBtn.textContent = 'Gravar Áudio';
+        btnAudio.classList.remove('gravando');
+        gravando = false;
+        btnAudio.title = "Gravar áudio";
       } else {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
+        // Começar gravação
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert('Seu navegador não suporta gravação de áudio.');
+          return;
+        }
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
 
-        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+          mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
 
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(audioChunks, { type: 'audio/webm' });
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            socket.emit('mensagem', { tipo: 'audio', autor: username, conteudo: reader.result });
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              socket.emit('mensagem', { tipo: 'audio', autor: username, conteudo: reader.result });
+            };
+            reader.readAsDataURL(blob);
           };
-          reader.readAsDataURL(blob);
-        };
 
-        mediaRecorder.start();
-        gravando.style.display = 'block';
-        gravarBtn.textContent = 'Parar Gravação';
+          mediaRecorder.start();
+          gravando = true;
+          btnAudio.classList.add('gravando');
+          btnAudio.title = "Parar gravação";
+        } catch(err) {
+          alert('Permissão para microfone negada ou erro ao acessar microfone.');
+          console.error(err);
+        }
       }
     });
 
-    // Recebendo mensagens
+    // Recebe mensagens
     socket.on('mensagem', data => {
       const msg = document.createElement('div');
       msg.style.marginBottom = '1rem';
 
-      if (data.tipo === 'texto') {
+      if(data.tipo === 'texto') {
         msg.innerHTML = `<strong>${data.autor}:</strong> ${data.conteudo}`;
-      } else if (data.tipo === 'audio') {
+      } else if(data.tipo === 'audio') {
         msg.innerHTML = `<strong>${data.autor}:</strong><br>`;
         const audio = document.createElement('audio');
         audio.src = data.conteudo;
         audio.controls = true;
         msg.appendChild(audio);
       }
-
       chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
     });
+
+    // Usuários online (exemplo simples - pode ser melhorado)
+    let usuariosOnline = new Set();
+
+    socket.on('connect', () => {
+      socket.emit('novo_usuario', username);
+    });
+
+    socket.on('usuarios', lista => {
+      usuariosOnline = new Set(lista);
+      atualizarListaUsuarios();
+    });
+
+    function atualizarListaUsuarios() {
+      listaUsuarios.innerHTML = '';
+      usuariosOnline.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = user;
+        listaUsuarios.appendChild(li);
+      });
+    }
+
+    // Informar servidor ao entrar e sair para controlar usuários
+    socket.emit('novo_usuario', username);
+
   </script>
 </body>
 </html>
