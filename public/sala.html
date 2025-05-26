@@ -1,115 +1,224 @@
 <!DOCTYPE html><html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sala Global</title>
-  <style>
-    body {
-      background-color: #1e1e1e;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      margin: 0;
-    }
-    header {
-      background-color: #2a2a2a;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    #usuarios {
-      background-color: #2a2a2a;
-      padding: 1rem;
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 250px;
-      height: 100%;
-      overflow-y: auto;
-      display: none;
-    }
-    #chat {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      background-color: #1e1e1e;
-    }
-    form {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
-      background-color: #2a2a2a;
-      align-items: center;
-    }
-    input[type="text"] {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      border-radius: 4px;
-      font-size: 1rem;
-    }
-    button, label[for="imagemInput"] {
-      background-color: #4caf50;
-      border: none;
-      padding: 0.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-      color: white;
-      font-size: 1rem;
-    }
-    button:hover, label[for="imagemInput"]:hover {
-      background-color: #45a049;
-    }
-    #imagemInput {
-      display: none;
-    }
-    .usuario-item {
-      cursor: pointer;
-      color: #4fc3f7;
-      text-decoration: underline;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sala Global</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      height: 100vh;
+      display: flex;
+      background: linear-gradient(135deg, #1e1e2f, #111118);
+      background-image: url('https://www.transparenttextures.com/patterns/rocky-wall.png');
+      color: white;
+    }
+    #sidebar {
+      width: 250px;
+      background-color: #2a2a3a;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      overflow-y: auto;
+    }
+    #sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .user {
+      cursor: pointer;
+      padding: 0.4rem;
+      border-radius: 6px;
+      background: #383848;
+      transition: background 0.2s;
+    }
+    .user:hover {
+      background: #4b4b60;
+    }
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #chat {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background-color: #f4f4f4;
+      color: #1e1e2f;
+    }
+    #chat .msg {
+      margin-bottom: 0.8rem;
+    }
+    #chat .msg strong {
+      color: #2a8;
+    }
+    #input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      background: #1a1a26;
+      align-items: center;
+    }
+    #input-area input[type="text"] {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: none;
+      background: #2e2e3d;
+      color: white;
+    }
+    #input-area button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      font-size: 1.2rem;
+    }
+    #input-area input[type="file"] {
+      display: none;
+    }
+    #mobile-toggle, #close-sidebar {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      #sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 10;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      #sidebar.active {
+        transform: translateX(0);
+      }
+      #mobile-toggle, #close-sidebar {
+        display: block;
+        position: absolute;
+        top: 1rem;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        z-index: 11;
+      }
+      #mobile-toggle {
+        left: 1rem;
+      }
+      #close-sidebar {
+        left: 210px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h2>Sala Global</h2>
-    <button id="toggleUsuarios">Usuários</button>
-  </header>
-  <div id="usuarios">
-    <button id="fecharUsuarios">Fechar</button>
-    <h3>Usuários Online</h3>
-    <ul id="listaUsuarios"></ul>
-  </div>
-  <div id="chat"></div>
-  <form id="form">
-    <input type="text" id="mensagem" placeholder="Digite sua mensagem" autocomplete="off" />
-    <label for="imagemInput" title="Enviar imagem">🖼️</label>
-    <input type="file" id="imagemInput" accept="image/*">
-    <button type="submit">Enviar</button>
-  </form>  <script src="/socket.io/socket.io.js"></script>   <script>     const socket = io();     const chat = document.getElementById('chat');     const form = document.getElementById('form');     const mensagemInput = document.getElementById('mensagem');     const imagemInput = document.getElementById('imagemInput');     const listaUsuarios = document.getElementById('listaUsuarios');     const toggleUsuarios = document.getElementById('toggleUsuarios');     const fecharUsuarios = document.getElementById('fecharUsuarios');
+  <button id="mobile-toggle">☰</button>
+  <aside id="sidebar">
+    <button id="close-sidebar">✕</button>
+    <h2>Usuários Online</h2>
+    <div id="users"></div>
+  </aside>  <main id="main">
+    <div id="chat"></div>
+    <div id="input-area">
+      <input type="text" id="msgInput" placeholder="Digite uma mensagem..." />
+      <input type="file" id="imgInput" accept="image/*" />
+      <label for="imgInput" title="Enviar imagem">🖼️</label>
+      <button id="micBtn" title="Gravar áudio">🎤</button>
+      <button id="sendBtn" title="Enviar">➤</button>
+    </div>
+  </main>  <script src="/socket.io/socket.io.js"></script>  <script>
+    const socket = io();
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username') || 'Anônimo';
+    const chat = document.getElementById('chat');
+    const usersDiv = document.getElementById('users');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const imgInput = document.getElementById('imgInput');
+    const micBtn = document.getElementById('micBtn');
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const closeSidebar = document.getElementById('close-sidebar');
 
-    const urlParams = new URLSearchParams(window.location.search);     const username = urlParams.get('username') || 'Anônimo';
+    socket.emit('join', username);
 
-    let usuariosOnline = [];
+    socket.on('updateUsers', users => {
+      usersDiv.innerHTML = '';
+      users.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user';
+        div.textContent = user;
+        div.onclick = () => {
+          msgInput.value += `@${user} `;
+          msgInput.focus();
+        };
+        usersDiv.appendChild(div);
+      });
+    });
 
-    socket.emit('usuario_entrando', username);
+    socket.on('mensagem', data => {
+      const msg = document.createElement('div');
+      msg.className = 'msg';
+      if (data.img) {
+        msg.innerHTML = `<strong>${data.user}:</strong><br><img src="${data.img}" alt="imagem" style="max-width:200px;border-radius:10px;cursor:pointer;" onclick="window.open('${data.img}', '_blank')" />`;
+      } else if (data.audio) {
+        msg.innerHTML = `<strong>${data.user}:</strong><br><audio controls src="${data.audio}"></audio>`;
+      } else {
+        msg.innerHTML = `<strong>${data.user}:</strong> ${data.text}`;
+      }
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    });
 
-    toggleUsuarios.onclick = () => {       document.getElementById('usuarios').style.display = 'block';     };     fecharUsuarios.onclick = () => {       document.getElementById('usuarios').style.display = 'none';     };
+    sendBtn.onclick = () => {
+      const text = msgInput.value.trim();
+      if (text) {
+        socket.emit('mensagem', { user: username, text });
+        msgInput.value = '';
+      }
+    };
 
-    form.addEventListener('submit', e => {       e.preventDefault();       const texto = mensagemInput.value.trim();       if (texto) {         socket.emit('mensagem', { nome: username, texto });         mensagemInput.value = '';       }     });
+    imgInput.onchange = () => {
+      const file = imgInput.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          socket.emit('mensagem', { user: username, img: reader.result });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
-    imagemInput.addEventListener('change', () => {       const file = imagemInput.files[0];       if (!file) return;       const reader = new FileReader();       reader.onload = () => {         socket.emit('imagem', { nome: username, imagem: reader.result });       };       reader.readAsDataURL(file);     });
+    let mediaRecorder, audioChunks = [];
 
-    socket.on('usuarios_online', nomes => {       usuariosOnline = nomes;       listaUsuarios.innerHTML = '';       nomes.forEach(nome => {         const li = document.createElement('li');         li.textContent = nome;         li.classList.add('usuario-item');         li.onclick = () => {           mensagemInput.value += @${nome} ;           mensagemInput.focus();         };         listaUsuarios.appendChild(li);       });     });
+    micBtn.onclick = async () => {
+      if (!navigator.mediaDevices) return alert('Gravação não suportada');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
 
-    socket.on('mensagem', data => {       const div = document.createElement('div');       let texto = data.texto;       usuariosOnline.forEach(nome => {         const regex = new RegExp(@${nome}\\b, 'g');         texto = texto.replace(regex, <strong style="color:#ffd54f">@${nome}</strong>);       });       div.innerHTML = <strong>${data.nome}:</strong> ${texto};       chat.appendChild(div);       chat.scrollTop = chat.scrollHeight;     });
+      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.onload = () => {
+          socket.emit('mensagem', { user: username, audio: reader.result });
+        };
+        reader.readAsDataURL(blob);
+      };
 
-    socket.on('imagem', data => {       const div = document.createElement('div');       div.innerHTML = <strong>${data.nome}:</strong> <br><img src="${data.imagem}" alt="imagem" style="max-width: 200px; display:block;" /><button onclick="this.previousElementSibling.style.display=this.previousElementSibling.style.display==='none'?'block':'none'">Ver/Ocultar</button>;       chat.appendChild(div);       chat.scrollTop = chat.scrollHeight;     });   </script>
+      mediaRecorder.start();
+      setTimeout(() => mediaRecorder.stop(), 60000);
+      micBtn.textContent = '⏺️ Gravando...';
+      setTimeout(() => micBtn.textContent = '🎤', 60000);
+    };
 
-</body>
+    mobileToggle.onclick = () => document.getElementById('sidebar').classList.add('active');
+    closeSidebar.onclick = () => document.getElementById('sidebar').classList.remove('active');
+  </script></body>
 </html>
