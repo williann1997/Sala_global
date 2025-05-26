@@ -1,121 +1,44 @@
-body {
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #1e1e1e;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
+body { margin: 0; font-family: 'Inter', sans-serif; background-color: #121212; color: white; display: flex; flex-direction: column; height: 100vh; }
 
-header {
-  background-color: #2a2a2a;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+header { background-color: #1f1f1f; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-#container {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-}
+#container { flex: 1; display: flex; overflow: hidden; }
 
-.usuarios-container {
-  width: 200px;
-  background-color: #333;
-  padding: 1rem;
-  display: block;
-}
+.usuarios-container { width: 200px; background-color: #1e1e1e; padding: 1rem; display: block; border-right: 1px solid #2a2a2a; }
 
-#usuarios {
-  list-style: none;
-  padding: 0;
-}
+#usuarios { list-style: none; padding: 0; margin: 0; }
 
-#chatContainer {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+#usuarios li { padding: 0.5rem 0; border-bottom: 1px solid #333; cursor: pointer; transition: background 0.3s ease; }
 
-.chat-messages {
-  flex: 1;
-  padding: 1rem;
-  overflow-y: auto;
-  list-style: none;
-}
+#usuarios li:hover { background-color: #2a2a2a; }
 
-.form-chat {
-  display: flex;
-  align-items: center;
-  padding: 1rem;
-  background-color: #2a2a2a;
-  gap: 0.5rem;
-}
+#chatContainer { flex: 1; display: flex; flex-direction: column; background: #1a1a1a; }
 
-.form-chat input[type="text"] {
-  flex: 1;
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: none;
-  font-size: 1rem;
-}
+.chat-messages { flex: 1; padding: 1rem; overflow-y: auto; list-style: none; background-color: #252525; border-left: 1px solid #2a2a2a; }
 
-#btnEnviar {
-  padding: 0.5rem 1rem;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+.chat-messages li { margin-bottom: 1rem; padding: 0.5rem 1rem; background-color: #333; border-radius: 8px; word-wrap: break-word; }
 
-.icon-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
+.form-chat { display: flex; align-items: center; padding: 1rem; background-color: #1f1f1f; gap: 0.5rem; border-top: 1px solid #2a2a2a; }
 
-.btn-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
+.form-chat input[type="text"] { flex: 1; padding: 0.5rem; border-radius: 6px; border: none; font-size: 1rem; background-color: #2a2a2a; color: white; }
 
-.btn-icon img {
-  width: 24px;
-  height: 24px;
-  filter: invert(1);
-}
+#btnEnviar { padding: 0.5rem 1rem; background-color: #4caf50; color: white; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease; }
 
-.btn-usuarios-mobile {
-  display: none;
-}
+#btnEnviar:hover { background-color: #45a049; }
 
-/* Modo responsivo */
-@media (max-width: 768px) {
-  .usuarios-container {
-    display: none;
-  }
+.icon-buttons { display: flex; align-items: center; gap: 0.3rem; }
 
-  .usuarios-container.active {
-    display: block;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    background-color: #333;
-    width: 100%;
-    z-index: 10;
-  }
+.btn-icon { background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-  .btn-usuarios-mobile {
-    display: block;
-    background-color: #444;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-  }
-}
+.btn-icon img { width: 24px; height: 24px; filter: invert(1); opacity: 0.8; transition: opacity 0.2s ease; }
+
+.btn-icon img:hover { opacity: 1; }
+
+.btn-usuarios-mobile { display: none; background-color: #444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; }
+
+@media (max-width: 768px) { .usuarios-container { display: none; }
+
+.usuarios-container.active { display: block; position: absolute; top: 60px; left: 0; background-color: #1e1e1e; width: 100%; z-index: 10; }
+
+.btn-usuarios-mobile { display: block; margin-left: 1rem; } }
+
