@@ -1,422 +1,147 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sala Global</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
-  /* Reset básico */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-  }
-
-  body {
-    background: #121212 url('https://www.transparenttextures.com/patterns/dark-mosaic.png') repeat;
-    color: #eee;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  header {
-    background: rgba(40, 40, 40, 0.85);
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.8);
-    user-select: none;
-  }
-
-  header h1 {
-    font-weight: 700;
-    font-size: 1.4rem;
-    letter-spacing: 0.05em;
-  }
-
-  #btnToggleUsers {
-    display: none;
-    background: transparent;
-    border: none;
-    font-size: 1.6rem;
-    color: #8af;
-    cursor: pointer;
-  }
-
-  #userList {
-    background: rgba(30,30,30,0.9);
-    width: 220px;
-    overflow-y: auto;
-    border-left: 3px solid #5577cc;
-    transition: transform 0.3s ease;
-  }
-
-  #userList h2 {
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 1rem;
-    border-bottom: 1px solid #5577cc;
-    color: #aaf;
-  }
-
-  #userList ul {
-    list-style: none;
-    padding: 0 1rem 1rem;
-  }
-
-  #userList ul li {
-    padding: 0.5rem 0;
-    cursor: pointer;
-    border-radius: 4px;
-    color: #cce;
-    transition: background-color 0.2s ease;
-  }
-
-  #userList ul li:hover {
-    background-color: #5577cc;
-  }
-
-  main {
-    flex: 1;
-    display: flex;
-    background: #1e1e1e;
-  }
-
-  #chat {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #f5f5f5;
-    color: #222;
-    padding: 1rem;
-    overflow-y: auto;
-  }
-
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-  }
-
-  .msg {
-    margin-bottom: 1rem;
-    padding: 0.5rem 0.75rem;
-    border-radius: 6px;
-    background: #e8e8e8;
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
-    position: relative;
-  }
-
-  .msg strong.username {
-    color: #336699;
-    cursor: pointer;
-  }
-
-  .msg .text {
-    margin-top: 0.25rem;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-  }
-
-  .msg img {
-    max-width: 250px;
-    max-height: 200px;
-    border-radius: 6px;
-    margin-top: 0.5rem;
-    cursor: pointer;
-    box-shadow: 0 0 6px rgba(0,0,0,0.1);
-    transition: box-shadow 0.3s ease;
-  }
-
-  .msg img:hover {
-    box-shadow: 0 0 15px #5577cc;
-  }
-
-  .msg audio {
-    margin-top: 0.5rem;
-    width: 100%;
-    outline: none;
-  }
-
-  #formMsg {
-    background: #2a2a2a;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  #inputMsg {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
-    border-radius: 30px;
-    border: none;
-    outline: none;
-    background: #444;
-    color: #eee;
-  }
-
-  button {
-    background: #5577cc;
-    border: none;
-    color: white;
-    padding: 0.6rem 1rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    user-select: none;
-    transition: background-color 0.3s ease;
-  }
-
-  button:hover:not(:disabled) {
-    background: #3355aa;
-  }
-
-  button:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-
-  #btnSend {
-    flex-shrink: 0;
-  }
-
-  #btnSendImage,
-  #btnRecordAudio {
-    background: transparent;
-    color: #88aaff;
-    font-size: 1.5rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 50%;
-    transition: background-color 0.2s ease;
-  }
-
-  #btnSendImage:hover,
-  #btnRecordAudio:hover {
-    background: #3355aa;
-    color: white;
-  }
-
-  #fileImage {
-    display: none;
-  }
-
-  /* Mobile */
-  @media (max-width: 768px) {
-    body {
-      overflow: hidden;
-    }
-    #userList {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: 220px;
-      transform: translateX(100%);
-      z-index: 20;
-      box-shadow: -3px 0 8px rgba(0,0,0,0.6);
-    }
-
-    #userList.show {
-      transform: translateX(0);
-    }
-
-    #btnToggleUsers {
-      display: block;
-    }
-
-    main {
-      flex-direction: column;
-    }
-
-    #chat {
-      height: calc(100vh - 56px);
-      padding: 0.75rem;
-    }
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SALA PRINCIPAL</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
-<header>
-  <h1>Sala Global</h1>
-  <button id="btnToggleUsers" title="Mostrar/Ocultar usuários">&#9776;</button>
-</header>
-<main>
-  <section id="chat" aria-label="Mural de mensagens">
-    <div id="messages" aria-live="polite" aria-relevant="additions"></div>
-    <form id="formMsg">
-      <input id="inputMsg" autocomplete="off" placeholder="Digite uma mensagem..." aria-label="Mensagem" />
-      <button type="button" id="btnSendImage" title="Enviar imagem" aria-label="Enviar imagem">&#128247;</button>
-      <input type="file" id="fileImage" accept="image/*" />
-      <button type="button" id="btnRecordAudio" title="Gravar áudio (até 1 minuto)" aria-label="Gravar áudio">&#127908;</button>
-      <button type="submit" id="btnSend" disabled>Enviar</button>
-    </form>
-  </section>
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Usuários</h2>
+        <button class="close-sidebar" onclick="toggleSidebar()">×</button>
+      </div>
+      <ul id="usuariosOnline"></ul>
+    </aside>
 
-  <aside id="userList" aria-label="Lista de usuários online">
-    <h2>Usuários Online</h2>
-    <ul></ul>
-  </aside>
-</main>
+    <main class="chat">
+      <header class="chat-header">
+        <h1>SALA PRINCIPAL</h1>
+        <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+      </header>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  const socket = io();
+      <ul id="mural" class="mural"></ul>
 
-  // Pegando elementos DOM
-  const messagesEl = document.getElementById('messages');
-  const formMsg = document.getElementById('formMsg');
-  const inputMsg = document.getElementById('inputMsg');
-  const btnSend = document.getElementById('btnSend');
-  const btnSendImage = document.getElementById('btnSendImage');
-  const fileImage = document.getElementById('fileImage');
-  const btnRecordAudio = document.getElementById('btnRecordAudio');
-  const userListEl = document.querySelector('#userList ul');
-  const userListContainer = document.getElementById('userList');
-  const btnToggleUsers = document.getElementById('btnToggleUsers');
+      <form id="formMensagem" class="chat-form">
+        <input type="text" id="mensagem" placeholder="Digite uma mensagem..." autocomplete="off" />
+        <input type="file" id="imagemInput" accept="image/*" hidden />
+        <button type="button" onclick="document.getElementById('imagemInput').click()">📷</button>
+        <button type="button" id="audioBtn">🎤</button>
+        <button type="submit">Enviar</button>
+      </form>
+    </main>
+  </div>
 
-  // Variáveis de estado
-  let username = null;
-  let recording = false;
-  let mediaRecorder;
-  let audioChunks = [];
+  <script>
+    const socket = io();
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get("username") || "Anônimo";
 
-  // Pega o nome no query string
-  const urlParams = new URLSearchParams(window.location.search);
-  username = urlParams.get('username');
-  if (!username) {
-    alert('Nome de usuário não informado!');
-    window.location.href = '/';
-  }
+    const mural = document.getElementById("mural");
+    const form = document.getElementById("formMensagem");
+    const input = document.getElementById("mensagem");
+    const imagemInput = document.getElementById("imagemInput");
+    const usuariosOnline = document.getElementById("usuariosOnline");
 
-  // Avisar server que entrou com username
-  socket.emit('join', username);
+    socket.emit("entrar", username);
 
-  // Habilitar botão enviar se digitar algo
-  inputMsg.addEventListener('input', () => {
-    btnSend.disabled = inputMsg.value.trim().length === 0;
-  });
-
-  // Função para criar mensagem no mural
-  function addMessage({username: user, text, image, audio}) {
-    const msgEl = document.createElement('div');
-    msgEl.classList.add('msg');
-
-    // Nome do usuário clicável para mencionar
-    const userNameEl = document.createElement('strong');
-    userNameEl.classList.add('username');
-    userNameEl.textContent = user;
-    userNameEl.title = 'Clique para mencionar';
-    userNameEl.addEventListener('click', () => {
-      inputMsg.value += `@${user} `;
-      inputMsg.focus();
-      btnSend.disabled = false;
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const texto = input.value.trim();
+      if (texto) {
+        socket.emit("mensagem", { username, text: texto });
+        input.value = "";
+      }
     });
-    msgEl.appendChild(userNameEl);
 
-    if (text) {
-      const textEl = document.createElement('div');
-      textEl.classList.add('text');
-      textEl.textContent = text;
-      msgEl.appendChild(textEl);
-    }
-
-    if (image) {
-      // Imagem com botão ver/ocultar
-      const imgWrapper = document.createElement('div');
-      imgWrapper.style.position = 'relative';
-
-      const imgEl = document.createElement('img');
-      imgEl.src = image;
-      imgEl.alt = 'Imagem enviada';
-      imgEl.style.display = 'none'; // inicialmente oculta
-
-      const btnToggleImg = document.createElement('button');
-      btnToggleImg.textContent = 'Mostrar imagem';
-      btnToggleImg.style.marginTop = '0.5rem';
-      btnToggleImg.style.cursor = 'pointer';
-      btnToggleImg.style.border = 'none';
-      btnToggleImg.style.background = '#5577cc';
-      btnToggleImg.style.color = '#fff';
-      btnToggleImg.style.borderRadius = '6px';
-      btnToggleImg.style.padding = '0.3rem 0.6rem';
-      btnToggleImg.addEventListener('click', () => {
-        if (imgEl.style.display === 'none') {
-          imgEl.style.display = 'block';
-          btnToggleImg.textContent = 'Ocultar imagem';
-        } else {
-          imgEl.style.display = 'none';
-          btnToggleImg.textContent = 'Mostrar imagem';
-        }
-      });
-
-      imgWrapper.appendChild(btnToggleImg);
-      imgWrapper.appendChild(imgEl);
-      msgEl.appendChild(imgWrapper);
-    }
-
-    if (audio) {
-      const audioEl = document.createElement('audio');
-      audioEl.controls = true;
-      audioEl.src = audio;
-      msgEl.appendChild(audioEl);
-    }
-
-    messagesEl.appendChild(msgEl);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  // Atualiza a lista de usuários
-  socket.on('userList', users => {
-    userListEl.innerHTML = '';
-    users.forEach(user => {
-      const li = document.createElement('li');
-      li.textContent = user;
-      li.title = 'Clique para mencionar';
-      li.addEventListener('click', () => {
-        inputMsg.value += `@${user} `;
-        inputMsg.focus();
-        btnSend.disabled = false;
-      });
-      userListEl.appendChild(li);
+    socket.on("mensagem", data => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong class="user-name" onclick="mencionar('${data.username}')">${data.username}</strong>: ${data.text}`;
+      mural.appendChild(li);
+      mural.scrollTop = mural.scrollHeight;
     });
-  });
 
-  // Recebe mensagens
-  socket.on('message', msg => {
-    addMessage(msg);
-  });
+    socket.on("usuarios", usuarios => {
+      usuariosOnline.innerHTML = "";
+      usuarios.forEach(nome => {
+        const li = document.createElement("li");
+        li.textContent = nome;
+        li.onclick = () => mencionar(nome);
+        usuariosOnline.appendChild(li);
+      });
+    });
 
-  // Enviar mensagem texto
-  formMsg.addEventListener('submit', e => {
-    e.preventDefault();
-    const text = inputMsg.value.trim();
-    if (!text) return;
-    socket.emit('message', {username, text});
-    inputMsg.value = '';
-    btnSend.disabled = true;
-  });
+    function mencionar(nome) {
+      input.value += `@${nome} `;
+      input.focus();
+    }
 
-  // Botão toggle lista usuários mobile
-  btnToggleUsers.addEventListener('click', () => {
-    userListContainer.classList.toggle('show');
-  });
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("visible");
+    }
 
-  // Upload e envio de imagem
-  btnSendImage.addEventListener('click', () => {
-    fileImage.click();
-  });
+    imagemInput.addEventListener("change", () => {
+      const file = imagemInput.files[0];
+      if (!file) return;
 
-  fileImage.addEventListener('change', () => {
-    const file = fileImage.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      const imageData = e
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imgId = `img-${Date.now()}`;
+        socket.emit("mensagem", {
+          username,
+          text: `
+            <div class="image-container">
+              <button onclick="document.getElementById('${imgId}').style.display='block'; this.style.display='none'; this.nextElementSibling.style.display='inline-block';">Ver imagem</button>
+              <button style="display:none;" onclick="document.getElementById('${imgId}').style.display='none'; this.style.display='none'; this.previousElementSibling.style.display='inline-block';">Ocultar imagem</button>
+              <img id="${imgId}" src="${reader.result}" class="chat-img" style="display:none;" />
+            </div>
+          `
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Áudio (até 1 minuto)
+    const audioBtn = document.getElementById("audioBtn");
+    let mediaRecorder;
+    let chunks = [];
+
+    audioBtn.addEventListener("click", () => {
+      if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+
+          audioBtn.textContent = "■";
+
+          mediaRecorder.ondataavailable = e => chunks.push(e.data);
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: "audio/webm" });
+            chunks = [];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              socket.emit("mensagem", {
+                username,
+                text: `<audio controls src="${reader.result}"></audio>`
+              });
+            };
+            reader.readAsDataURL(blob);
+            audioBtn.textContent = "🎤";
+          };
+
+          setTimeout(() => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+              mediaRecorder.stop();
+            }
+          }, 60000);
+        });
+      } else if (mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+    });
+  </script>
+</body>
+</html>
