@@ -8,72 +8,70 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.static("public"));
 
-let usuarios = {};
+let usuarios = new Map(); // socket.id => { username, cor }
 
 io.on("connection", (socket) => {
-  let nomeUsuario = "";
-  let corUsuario = "#000000";
+  console.log(`Usuário conectado: ${socket.id}`);
 
-  socket.on("entrar", (nome) => {
-    nomeUsuario = nome || "Anônimo";
-    usuarios[socket.id] = { nome: nomeUsuario, cor: corUsuario };
+  socket.on("entrar", (data) => {
+    const { username, cor } = typeof data === "object" ? data : { username: data, cor: "#007bff" };
+    usuarios.set(socket.id, { username, cor });
     atualizarUsuarios();
 
-    io.emit("mensagem", {
-      username: "Sistema",
-      texto: `${nomeUsuario} entrou na sala.`,
-      fonte: "Inter",
-      cor: "#888888"
+    socket.broadcast.emit("mensagem", {
+      system: true,
+      texto: `${username} entrou na sala.`,
     });
   });
 
   socket.on("mensagem", (data) => {
-    const { username, texto, cor, fonte } = data;
+    const user = usuarios.get(socket.id);
+    if (!user) return;
+    const { username, cor } = user;
+    const texto = data.texto || "";
+    if (texto.trim().length === 0) return;
 
-    if (texto && username) {
-      usuarios[socket.id] = { nome: username, cor: cor || "#000000" };
-
-      io.emit("mensagem", {
-        username,
-        texto,
-        cor: cor || "#000000",
-        fonte: fonte || "Inter"
-      });
-    }
+    io.emit("mensagem", {
+      username,
+      texto,
+      cor,
+      system: false,
+    });
   });
 
   socket.on("imagem", (data) => {
-    const { username, imagem, cor } = data;
+    const user = usuarios.get(socket.id);
+    if (!user) return;
+    const { username, cor } = user;
+    if (!data.imagem) return;
 
-    if (imagem && username) {
-      io.emit("imagem", {
-        username,
-        imagem,
-        cor: cor || "#000000"
-      });
-    }
+    io.emit("mensagem", {
+      username,
+      imagem: data.imagem,
+      cor,
+      system: false,
+    });
   });
 
   socket.on("disconnect", () => {
-    const usuario = usuarios[socket.id];
-    if (usuario) {
-      io.emit("mensagem", {
-        username: "Sistema",
-        texto: `${usuario.nome} saiu da sala.`,
-        fonte: "Inter",
-        cor: "#888888"
+    const user = usuarios.get(socket.id);
+    if (user) {
+      socket.broadcast.emit("mensagem", {
+        system: true,
+        texto: `${user.username} saiu da sala.`,
       });
-      delete usuarios[socket.id];
+      usuarios.delete(socket.id);
       atualizarUsuarios();
     }
+    console.log(`Usuário desconectado: ${socket.id}`);
   });
 
   function atualizarUsuarios() {
-    const nomes = Object.values(usuarios).map((u) => u.nome);
-    io.emit("usuarios", nomes);
+    // Envia lista de { username, cor }
+    io.emit("usuarios", Array.from(usuarios.values()));
   }
 });
 
 http.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
