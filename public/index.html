@@ -3,18 +3,77 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Entrar na Sala</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Bem-vindo ao MMChat</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #3a3a3a, #2c2c2c);
+      color: #fff;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('https://www.transparenttextures.com/patterns/black-linen.png');
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      background-color: #444;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #43a047;
+    }
+  </style>
 </head>
 <body>
-  <div class="container" style="justify-content: center; align-items: center;">
-    <main class="chat" style="max-width: 400px; text-align: center;">
-      <h1>Bem-vindo à Sala Global</h1>
-      <form onsubmit="entrar(event)">
-        <input type="text" id="username" placeholder="Digite seu nome" required style="margin-bottom: 1rem; width: 100%; padding: 0.5rem;" />
-        <button type="submit" style="padding: 0.5rem 1rem;">Entrar</button>
-      </form>
-    </main>
+  <div class="container">
+    <h1>Bem-vindo ao <strong>MMChat</strong></h1>
+    <form onsubmit="entrar(event)">
+      <input type="text" id="username" placeholder="Digite seu nome" required />
+      <button type="submit">Entrar</button>
+    </form>
   </div>
 
   <script>
