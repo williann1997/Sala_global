@@ -3,31 +3,66 @@ const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
 const path = require('path');
+const multer = require('multer');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const usuariosOnline = new Map();
+const users = {};
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Configuração de armazenamento para uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, 'uploads');
+    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath);
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName);
+  },
+});
+const upload = multer({ storage });
+
+// Endpoint para upload de imagem
+app.post('/upload', upload.single('imagem'), (req, res) => {
+  const imageUrl = `/uploads/${req.file.filename}`;
+  res.json({ imageUrl });
+});
+
+// Endpoint para upload de áudio
+app.post('/audio', upload.single('audio'), (req, res) => {
+  const audioUrl = `/uploads/${req.file.filename}`;
+  res.json({ audioUrl });
+});
+
+// WebSocket
 io.on('connection', socket => {
-  console.log('Novo usuário conectado');
-
-  socket.on('usuario_entrando', nome => {
-    usuariosOnline.set(socket.id, nome);
-    io.emit('atualizar_usuarios', Array.from(usuariosOnline.values()));
+  socket.on('entrar', username => {
+    users[socket.id] = username;
+    io.emit('usuarios', Object.values(users));
   });
 
   socket.on('mensagem', data => {
     io.emit('mensagem', data);
   });
 
+  socket.on('imagem', data => {
+    io.emit('imagem', data);
+  });
+
+  socket.on('audio', data => {
+    io.emit('audio', data);
+  });
+
   socket.on('disconnect', () => {
-    usuariosOnline.delete(socket.id);
-    io.emit('atualizar_usuarios', Array.from(usuariosOnline.values()));
-    console.log('Usuário desconectado');
+    delete users[socket.id];
+    io.emit('usuarios', Object.values(users));
   });
 });
 
