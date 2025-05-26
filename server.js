@@ -1,44 +1,40 @@
-// server.js
 const express = require('express');
 const http = require('http');
-const socketio = require('socket.io');
 const path = require('path');
+const socketio = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// Servir arquivos estáticos da pasta "public"
+const PORT = process.env.PORT || 3000;
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const usuarios = new Map();
 
 io.on('connection', socket => {
-  console.log('Novo usuário conectado');
+  console.log('Novo usuário conectado:', socket.id);
 
-  let nomeUsuario = '';
-
-  socket.on('entrar', nome => {
-    nomeUsuario = nome;
-    usuarios.set(socket.id, nome);
-    io.emit('usuarios', Array.from(usuarios.values()));
-    socket.broadcast.emit('sistema', `${nome} entrou na sala`);
+  socket.on('entrar', username => {
+    usuarios.set(socket.id, username);
+    io.emit('usuariosAtualizados', Array.from(usuarios.values()));
+    console.log(`Usuário entrou: ${username}`);
   });
 
   socket.on('mensagem', data => {
+    // data: { tipo: 'texto'|'imagem'|'audio', autor, conteudo }
     io.emit('mensagem', data);
   });
 
   socket.on('disconnect', () => {
-    if (nomeUsuario) {
-      usuarios.delete(socket.id);
-      io.emit('usuarios', Array.from(usuarios.values()));
-      socket.broadcast.emit('sistema', `${nomeUsuario} saiu da sala`);
-    }
-    console.log('Usuário desconectado');
+    const nome = usuarios.get(socket.id);
+    usuarios.delete(socket.id);
+    io.emit('usuariosAtualizados', Array.from(usuarios.values()));
+    console.log('Usuário saiu:', nome);
   });
 });
 
-// Porta
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
