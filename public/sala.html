@@ -1,3 +1,4 @@
+<!-- public/sala.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,10 +10,10 @@
       background-color: #1e1e1e;
       color: white;
       font-family: Arial, sans-serif;
-      margin: 0;
-      height: 100vh;
       display: flex;
       flex-direction: column;
+      height: 100vh;
+      margin: 0;
     }
     header {
       background-color: #2a2a2a;
@@ -21,167 +22,273 @@
       justify-content: space-between;
       align-items: center;
     }
-    #usuariosBtn {
-      display: none;
-      background: #4caf50;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      color: white;
-      cursor: pointer;
-    }
-    main {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-    #usuarios {
-      width: 250px;
-      background-color: #333;
-      padding: 1rem;
-      display: block;
-    }
-    #usuarios h2 {
-      margin-top: 0;
-    }
-    #usuarios ul {
-      list-style: none;
-      padding: 0;
-    }
-    #usuarios ul li {
-      padding: 5px 0;
-    }
-    #chat-container {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
     #chat {
       flex: 1;
       padding: 1rem;
       overflow-y: auto;
+      background-color: #121212;
     }
-    .mensagem {
-      margin-bottom: 10px;
-    }
-    .mensagem strong {
-      color: #4caf50;
-    }
-    .sistema {
-      color: #aaa;
-      font-style: italic;
-    }
-    form {
+    #form {
       display: flex;
+      flex-direction: column;
       padding: 1rem;
       background-color: #2a2a2a;
     }
     input[type="text"] {
-      flex: 1;
-      padding: 0.5rem;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
       border: none;
       border-radius: 4px;
-      margin-right: 0.5rem;
       font-size: 1rem;
     }
     button {
-      padding: 0.5rem 1rem;
+      padding: 0.75rem;
       background-color: #4caf50;
       border: none;
       border-radius: 4px;
       color: white;
       font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
     }
-
-    @media (max-width: 768px) {
-      #usuarios {
-        display: none;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background: #333;
-        z-index: 999;
-        width: 200px;
-        height: calc(100% - 60px);
-        overflow-y: auto;
-      }
-      #usuariosBtn {
-        display: inline-block;
-      }
+    button:hover {
+      background-color: #45a049;
+    }
+    #gravando {
+      color: red;
+      margin-bottom: 0.5rem;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Sala Global</h1>
-    <button id="usuariosBtn">Usuários</button>
+    <h2>Sala Global</h2>
+    <span id="usuario"></span>
   </header>
-  <main>
-    <aside id="usuarios">
-      <h2>Participantes</h2>
-      <ul id="listaUsuarios"></ul>
-    </aside>
-    <div id="chat-container">
-      <div id="chat"></div>
-      <form id="formulario">
-        <input type="text" id="mensagem" placeholder="Digite sua mensagem" autocomplete="off" required />
-        <button type="submit">Enviar</button>
-      </form>
-    </div>
-  </main>
+  <div id="chat"></div>
+  <div id="form">
+    <div id="gravando" style="display:none;">Gravando áudio...</div>
+    <input id="mensagem" type="text" placeholder="Digite uma mensagem" />
+    <button id="enviar">Enviar Mensagem</button>
+    <button id="gravarAudio">Gravar Áudio</button>
+  </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username') || 'Anônimo';
-
     const chat = document.getElementById('chat');
-    const form = document.getElementById('formulario');
     const input = document.getElementById('mensagem');
-    const listaUsuarios = document.getElementById('listaUsuarios');
-    const usuariosBtn = document.getElementById('usuariosBtn');
-    const usuariosAside = document.getElementById('usuarios');
+    const enviar = document.getElementById('enviar');
+    const gravarBtn = document.getElementById('gravarAudio');
+    const gravando = document.getElementById('gravando');
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username') || 'Anônimo';
 
-    socket.emit('entrar', username);
+    document.getElementById('usuario').textContent = username;
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const msg = input.value.trim();
-      if (msg) {
-        socket.emit('mensagem', { usuario: username, texto: msg });
+    enviar.addEventListener('click', () => {
+      const texto = input.value.trim();
+      if (texto) {
+        socket.emit('mensagem', { tipo: 'texto', autor: username, conteudo: texto });
         input.value = '';
       }
     });
 
+    // Áudio
+    let mediaRecorder;
+    let audioChunks = [];
+
+    gravarBtn.addEventListener('click', async () => {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        gravando.style.display = 'none';
+        gravarBtn.textContent = 'Gravar Áudio';
+      } else {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            socket.emit('mensagem', { tipo: 'audio', autor: username, conteudo: reader.result });
+          };
+          reader.readAsDataURL(blob);
+        };
+
+        mediaRecorder.start();
+        gravando.style.display = 'block';
+        gravarBtn.textContent = 'Parar Gravação';
+      }
+    });
+
+    // Recebendo mensagens
     socket.on('mensagem', data => {
-      const msgEl = document.createElement('div');
-      msgEl.classList.add('mensagem');
-      msgEl.innerHTML = `<strong>${data.usuario}:</strong> ${data.texto}`;
-      chat.appendChild(msgEl);
+      const msg = document.createElement('div');
+      msg.style.marginBottom = '1rem';
+
+      if (data.tipo === 'texto') {
+        msg.innerHTML = `<strong>${data.autor}:</strong> ${data.conteudo}`;
+      } else if (data.tipo === 'audio') {
+        msg.innerHTML = `<strong>${data.autor}:</strong><br>`;
+        const audio = document.createElement('audio');
+        audio.src = data.conteudo;
+        audio.controls = true;
+        msg.appendChild(audio);
+      }
+
+      chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
     });
+  </script>
+</body>
+</html><!-- public/sala.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sala Global</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+    }
+    header {
+      background-color: #2a2a2a;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #chat {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background-color: #121212;
+    }
+    #form {
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      background-color: #2a2a2a;
+    }
+    input[type="text"] {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #gravando {
+      color: red;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Sala Global</h2>
+    <span id="usuario"></span>
+  </header>
+  <div id="chat"></div>
+  <div id="form">
+    <div id="gravando" style="display:none;">Gravando áudio...</div>
+    <input id="mensagem" type="text" placeholder="Digite uma mensagem" />
+    <button id="enviar">Enviar Mensagem</button>
+    <button id="gravarAudio">Gravar Áudio</button>
+  </div>
 
-    socket.on('sistema', texto => {
-      const msgEl = document.createElement('div');
-      msgEl.classList.add('mensagem', 'sistema');
-      msgEl.textContent = texto;
-      chat.appendChild(msgEl);
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('mensagem');
+    const enviar = document.getElementById('enviar');
+    const gravarBtn = document.getElementById('gravarAudio');
+    const gravando = document.getElementById('gravando');
+    const params = new URLSearchParams(window.location.search);
+    const username = params.get('username') || 'Anônimo';
+
+    document.getElementById('usuario').textContent = username;
+
+    enviar.addEventListener('click', () => {
+      const texto = input.value.trim();
+      if (texto) {
+        socket.emit('mensagem', { tipo: 'texto', autor: username, conteudo: texto });
+        input.value = '';
+      }
+    });
+
+    // Áudio
+    let mediaRecorder;
+    let audioChunks = [];
+
+    gravarBtn.addEventListener('click', async () => {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        gravando.style.display = 'none';
+        gravarBtn.textContent = 'Gravar Áudio';
+      } else {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+        mediaRecorder.onstop = () => {
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            socket.emit('mensagem', { tipo: 'audio', autor: username, conteudo: reader.result });
+          };
+          reader.readAsDataURL(blob);
+        };
+
+        mediaRecorder.start();
+        gravando.style.display = 'block';
+        gravarBtn.textContent = 'Parar Gravação';
+      }
+    });
+
+    // Recebendo mensagens
+    socket.on('mensagem', data => {
+      const msg = document.createElement('div');
+      msg.style.marginBottom = '1rem';
+
+      if (data.tipo === 'texto') {
+        msg.innerHTML = `<strong>${data.autor}:</strong> ${data.conteudo}`;
+      } else if (data.tipo === 'audio') {
+        msg.innerHTML = `<strong>${data.autor}:</strong><br>`;
+        const audio = document.createElement('audio');
+        audio.src = data.conteudo;
+        audio.controls = true;
+        msg.appendChild(audio);
+      }
+
+      chat.appendChild(msg);
       chat.scrollTop = chat.scrollHeight;
-    });
-
-    socket.on('usuarios', usuarios => {
-      listaUsuarios.innerHTML = '';
-      usuarios.forEach(u => {
-        const li = document.createElement('li');
-        li.textContent = u;
-        listaUsuarios.appendChild(li);
-      });
-    });
-
-    usuariosBtn.addEventListener('click', () => {
-      usuariosAside.style.display = usuariosAside.style.display === 'block' ? 'none' : 'block';
     });
   </script>
 </body>
