@@ -6,59 +6,45 @@ const io = new Server(http);
 
 const PORT = process.env.PORT || 3000;
 
-// Servir arquivos da pasta "public"
 app.use(express.static("public"));
 
-// Lista de usuários conectados
 let usuarios = {};
 
 io.on("connection", (socket) => {
   let nomeUsuario = "";
+  let corUsuario = "#000000";
 
-  socket.on("entrar", (nome) => {
-    nomeUsuario = nome || "Anônimo";
-    usuarios[socket.id] = nomeUsuario;
+  socket.on("entrar", (data) => {
+    nomeUsuario = data.nome || "Anônimo";
+    corUsuario = data.cor || "#000000";
+    usuarios[socket.id] = { nome: nomeUsuario, cor: corUsuario };
     atualizarUsuarios();
 
     io.emit("mensagem", {
       username: "Sistema",
       texto: `${nomeUsuario} entrou na sala.`,
-      fonte: "Inter",
       cor: "#aaaaaa"
     });
   });
 
   socket.on("mensagem", (data) => {
-    const { username, texto, fonte, cor } = data;
+    const { username, texto, cor } = data;
     if (texto && username) {
-      io.emit("mensagem", {
-        username,
-        texto,
-        fonte: fonte || "Inter",
-        cor: cor || "#ffffff"
-      });
+      io.emit("mensagem", { username, texto, cor: cor || "#000000" });
     }
   });
 
   socket.on("imagem", (data) => {
     const { username, imagem } = data;
     if (imagem && username) {
-      io.emit("imagem", {
-        username,
-        imagem,
-        cor: "#ffffff"
-      });
+      io.emit("imagem", { username, imagem, cor: corUsuario });
     }
   });
 
   socket.on("audio", (data) => {
     const { username, audio } = data;
     if (audio && username) {
-      io.emit("audio", {
-        username,
-        audio,
-        cor: "#ffffff"
-      });
+      io.emit("audio", { username, audio, cor: corUsuario });
     }
   });
 
@@ -66,8 +52,7 @@ io.on("connection", (socket) => {
     if (usuarios[socket.id]) {
       io.emit("mensagem", {
         username: "Sistema",
-        texto: `${usuarios[socket.id]} saiu da sala.`,
-        fonte: "Inter",
+        texto: `${usuarios[socket.id].nome} saiu da sala.`,
         cor: "#aaaaaa"
       });
 
