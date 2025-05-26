@@ -1,10 +1,8 @@
 const express = require("express");
-const http = require("http");
-const { Server } = require("socket.io");
-
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+const http = require("http").createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(http);
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,33 +10,26 @@ const PORT = process.env.PORT || 3000;
 app.use(express.static("public"));
 
 // Lista de usuários conectados
-const usuarios = {};
+let usuarios = {};
 
 io.on("connection", (socket) => {
-  console.log("Novo usuário conectado:", socket.id);
   let nomeUsuario = "";
 
-  // Evento quando o usuário entra
   socket.on("entrar", (nome) => {
-    nomeUsuario = nome?.trim() || "Anônimo";
+    nomeUsuario = nome || "Anônimo";
     usuarios[socket.id] = nomeUsuario;
+    atualizarUsuarios();
 
-    // Avisar todos que um novo usuário entrou
     io.emit("mensagem", {
       username: "Sistema",
       texto: `${nomeUsuario} entrou na sala.`,
       fonte: "Inter",
       cor: "#aaaaaa"
     });
-
-    // Atualizar lista de usuários para todos
-    atualizarUsuarios();
   });
 
-  // Mensagem de texto
   socket.on("mensagem", (data) => {
     const { username, texto, fonte, cor } = data;
-
     if (texto && username) {
       io.emit("mensagem", {
         username,
@@ -49,23 +40,33 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Envio de imagem
   socket.on("imagem", (data) => {
     const { username, imagem } = data;
-
     if (imagem && username) {
-      io.emit("imagem", { username, imagem });
+      io.emit("imagem", {
+        username,
+        imagem,
+        cor: "#ffffff"
+      });
     }
   });
 
-  // Quando o usuário se desconecta
+  socket.on("audio", (data) => {
+    const { username, audio } = data;
+    if (audio && username) {
+      io.emit("audio", {
+        username,
+        audio,
+        cor: "#ffffff"
+      });
+    }
+  });
+
   socket.on("disconnect", () => {
-    const nome = usuarios[socket.id];
-    if (nome) {
-      // Avisar que saiu
+    if (usuarios[socket.id]) {
       io.emit("mensagem", {
         username: "Sistema",
-        texto: `${nome} saiu da sala.`,
+        texto: `${usuarios[socket.id]} saiu da sala.`,
         fonte: "Inter",
         cor: "#aaaaaa"
       });
@@ -75,13 +76,11 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Função para atualizar a lista de usuários
   function atualizarUsuarios() {
     io.emit("usuarios", Object.values(usuarios));
   }
 });
 
-// Iniciar servidor
-server.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
