@@ -143,3 +143,21 @@ body {
     display: block;
   }
 }
+
+/* =================== */
+/* Destaque para menções */
+/* =================== */
+
+.mention {
+  background-color: #4caf50; /* verde que combina com seu tema */
+  color: #121212; /* texto escuro para contraste */
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
+  cursor: default;
+  transition: background-color 0.3s ease;
+}
+
+.mention:hover {
+  background-color: #81c784; /* verde claro ao passar o mouse */
+}
