@@ -9,10 +9,10 @@
       background-color: #1e1e1e;
       color: white;
       font-family: Arial, sans-serif;
+      margin: 0;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      margin: 0;
     }
     header {
       background-color: #2a2a2a;
@@ -21,75 +21,167 @@
       justify-content: space-between;
       align-items: center;
     }
+    #usuariosBtn {
+      display: none;
+      background: #4caf50;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    #usuarios {
+      width: 250px;
+      background-color: #333;
+      padding: 1rem;
+      display: block;
+    }
+    #usuarios h2 {
+      margin-top: 0;
+    }
+    #usuarios ul {
+      list-style: none;
+      padding: 0;
+    }
+    #usuarios ul li {
+      padding: 5px 0;
+    }
+    #chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
     #chat {
       flex: 1;
       padding: 1rem;
       overflow-y: auto;
-      background-color: #121212;
     }
-    #chat p {
-      margin: 0.5rem 0;
+    .mensagem {
+      margin-bottom: 10px;
+    }
+    .mensagem strong {
+      color: #4caf50;
+    }
+    .sistema {
+      color: #aaa;
+      font-style: italic;
     }
     form {
       display: flex;
-      background-color: #2a2a2a;
       padding: 1rem;
+      background-color: #2a2a2a;
     }
-    input {
+    input[type="text"] {
       flex: 1;
-      padding: 0.75rem;
+      padding: 0.5rem;
       border: none;
       border-radius: 4px;
-      margin-right: 1rem;
+      margin-right: 0.5rem;
+      font-size: 1rem;
     }
     button {
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #4caf50;
       border: none;
       border-radius: 4px;
-      background-color: #4caf50;
       color: white;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      #usuarios {
+        display: none;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background: #333;
+        z-index: 999;
+        width: 200px;
+        height: calc(100% - 60px);
+        overflow-y: auto;
+      }
+      #usuariosBtn {
+        display: inline-block;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>Sala Global</h2>
-    <span id="usernameLabel"></span>
+    <h1>Sala Global</h1>
+    <button id="usuariosBtn">Usuários</button>
   </header>
-
-  <div id="chat"></div>
-
-  <form id="form">
-    <input id="mensagemInput" autocomplete="off" placeholder="Digite sua mensagem..." />
-    <button>Enviar</button>
-  </form>
+  <main>
+    <aside id="usuarios">
+      <h2>Participantes</h2>
+      <ul id="listaUsuarios"></ul>
+    </aside>
+    <div id="chat-container">
+      <div id="chat"></div>
+      <form id="formulario">
+        <input type="text" id="mensagem" placeholder="Digite sua mensagem" autocomplete="off" required />
+        <button type="submit">Enviar</button>
+      </form>
+    </div>
+  </main>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get('username') || 'Anônimo';
-    document.getElementById('usernameLabel').textContent = `Usuário: ${username}`;
-    const form = document.getElementById('form');
-    const input = document.getElementById('mensagemInput');
-    const chat = document.getElementById('chat');
 
-    form.addEventListener('submit', (e) => {
+    const chat = document.getElementById('chat');
+    const form = document.getElementById('formulario');
+    const input = document.getElementById('mensagem');
+    const listaUsuarios = document.getElementById('listaUsuarios');
+    const usuariosBtn = document.getElementById('usuariosBtn');
+    const usuariosAside = document.getElementById('usuarios');
+
+    socket.emit('entrar', username);
+
+    form.addEventListener('submit', e => {
       e.preventDefault();
-      const mensagem = input.value.trim();
-      if (mensagem) {
-        socket.emit('mensagem', { usuario: username, texto: mensagem });
+      const msg = input.value.trim();
+      if (msg) {
+        socket.emit('mensagem', { usuario: username, texto: msg });
         input.value = '';
       }
     });
 
-    socket.on('mensagem', (data) => {
-      const p = document.createElement('p');
-      p.innerHTML = `<strong>${data.usuario}:</strong> ${data.texto}`;
-      chat.appendChild(p);
+    socket.on('mensagem', data => {
+      const msgEl = document.createElement('div');
+      msgEl.classList.add('mensagem');
+      msgEl.innerHTML = `<strong>${data.usuario}:</strong> ${data.texto}`;
+      chat.appendChild(msgEl);
       chat.scrollTop = chat.scrollHeight;
+    });
+
+    socket.on('sistema', texto => {
+      const msgEl = document.createElement('div');
+      msgEl.classList.add('mensagem', 'sistema');
+      msgEl.textContent = texto;
+      chat.appendChild(msgEl);
+      chat.scrollTop = chat.scrollHeight;
+    });
+
+    socket.on('usuarios', usuarios => {
+      listaUsuarios.innerHTML = '';
+      usuarios.forEach(u => {
+        const li = document.createElement('li');
+        li.textContent = u;
+        listaUsuarios.appendChild(li);
+      });
+    });
+
+    usuariosBtn.addEventListener('click', () => {
+      usuariosAside.style.display = usuariosAside.style.display === 'block' ? 'none' : 'block';
     });
   </script>
 </body>
