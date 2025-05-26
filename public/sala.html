@@ -2,229 +2,209 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sala - MMChat</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MMChat - Sala Global</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
     body {
-      background-color: #121212;
-      color: #ffffff;
+      margin: 0;
+      background: #2f2f2f;
+      font-family: 'Inter', sans-serif;
+      color: #000; /* fonte preta para destacar no mural cinza */
+      display: flex;
+      flex-direction: column;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       justify-content: center;
-      padding: 0.5rem;
+      align-items: center;
     }
-    .chat-container {
+    .container {
+      background: #d1d1d1; /* mural cinza claro */
+      border-radius: 12px;
+      box-shadow: 0 0 15px #0006;
+      width: 95vw;
+      max-width: 480px;
+      height: 90vh;
       display: flex;
       flex-direction: column;
-      width: 100%;
-      max-width: 480px;
-      height: 100%;
-      max-height: 700px;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-    }
-    .chat-header {
       padding: 1rem;
-      background-color: #2a2a2a;
-      text-align: center;
-      font-weight: bold;
-      position: relative;
-      font-size: 1.3rem;
-      color: #4caf50;
     }
-    #btnToggleUsuarios {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      color: #4caf50;
-      font-size: 1.4rem;
+    #chat {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      background: #eee;
+      border-radius: 8px;
+      margin-bottom: 0.7rem;
+      font-size: 0.95rem;
+      line-height: 1.2rem;
+      color: #000;
+    }
+    #chat .msg {
+      margin-bottom: 0.5rem;
+      word-wrap: break-word;
+    }
+    #chat .msg strong {
+      font-weight: 700;
+    }
+    #chat .msg .username {
+      cursor: pointer;
+    }
+    #chat .msg .texto {
+      margin-left: 5px;
+    }
+    #chat .msg img {
+      max-width: 150px;
+      max-height: 150px;
+      display: block;
+      margin-top: 0.3rem;
+      border-radius: 6px;
       cursor: pointer;
     }
     #usuariosContainer {
-      background-color: #222;
+      background: #ccc;
+      border-radius: 8px;
       padding: 0.5rem;
-      color: #ccc;
-      font-size: 0.9rem;
-      max-height: 150px;
+      font-size: 0.85rem;
+      margin-bottom: 0.7rem;
+      max-height: 80px;
       overflow-y: auto;
       display: none;
     }
     #usuariosContainer.active {
       display: block;
     }
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-      background-color: #444;
-      font-size: 1rem;
-      line-height: 1.4;
-    }
-    #chat div {
-      margin-bottom: 0.75rem;
-      word-wrap: break-word;
-    }
-    .chat-form {
-      padding: 0.75rem 1rem;
-      background-color: #2a2a2a;
+    #form {
       display: flex;
-      flex-wrap: wrap;
       gap: 0.5rem;
       align-items: center;
-      justify-content: center;
-    }
-    #fontSelect, #colorSelect {
-      flex: 1 1 45%;
-      padding: 6px;
-      border-radius: 5px;
-      border: none;
-      background-color: #333;
-      color: white;
-      font-size: 0.9rem;
     }
     #mensagem {
-      flex: 1 1 100%;
+      flex-grow: 1;
       padding: 0.5rem;
       border-radius: 5px;
       border: none;
-      background: #333;
-      color: white;
       font-size: 1rem;
-      margin-top: 0.5rem;
     }
-    button, .icon-btn {
-      background-color: #4caf50;
-      border: none;
-      color: white;
-      padding: 0.6rem 0.8rem;
-      border-radius: 5px;
+    button {
       cursor: pointer;
-      font-weight: bold;
-      font-size: 1rem;
-      user-select: none;
-      transition: background-color 0.2s ease;
+      background: #4b82f7;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      transition: background 0.3s;
     }
-    button:hover, .icon-btn:hover {
-      background-color: #3a8a33;
+    button:hover {
+      background: #3761c7;
     }
-    .icon-btn {
-      background-color: #555;
-      font-size: 1.3rem;
-      padding: 0.5rem 0.7rem;
-      flex: 0 0 auto;
-      margin-left: 0.2rem;
+    #btnImagem, #btnAudio, #btnToggleUsuarios {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      line-height: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
     }
-    .image-container img {
-      max-width: 100%;
-      border-radius: 6px;
-      margin-top: 0.4rem;
-    }
-    @media (max-width: 500px) {
-      .chat-container {
-        max-width: 100%;
-        max-height: 100vh;
-        border-radius: 0;
-      }
-      #fontSelect, #colorSelect {
-        flex: 1 1 48%;
-      }
-      #mensagem {
-        flex: 1 1 100%;
-        margin-top: 0.5rem;
-      }
-      .chat-form {
-        gap: 0.3rem;
-        padding: 0.5rem;
-      }
+    #inputImagem {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">
-      <button id="btnToggleUsuarios" title="Mostrar/ocultar usuários online">👥</button>
-      MMChat
-    </div>
-
-    <div id="usuariosContainer"></div>
+  <div class="container">
     <div id="chat"></div>
-
-    <form id="form" class="chat-form" autocomplete="off">
-      <select id="fontSelect" title="Selecione a fonte">
-        <option value="Inter">Padrão</option>
-        <option value="'Courier New', monospace">Mono</option>
-        <option value="'Comic Sans MS', cursive">Divertida</option>
-        <option value="'Times New Roman', serif">Clássica</option>
-        <option value="'Arial Black', Gadget, sans-serif">Negrito</option>
-      </select>
-
-      <select id="colorSelect" title="Selecione a cor da fonte">
-        <option value="#ffffff">Branco</option>
-        <option value="#4caf50">Verde</option>
-        <option value="#2196f3">Azul</option>
-        <option value="#ff9800">Laranja</option>
-        <option value="#f44336">Vermelho</option>
-        <option value="#e91e63">Rosa</option>
-      </select>
-
-      <input id="mensagem" type="text" placeholder="Digite sua mensagem..." required />
-      <button type="submit" title="Enviar mensagem">Enviar</button>
-      <button type="button" id="btnAudio" class="icon-btn" title="Enviar áudio">🎤</button>
-      <button type="button" id="btnImagem" class="icon-btn" title="Enviar imagem ou áudio">📎</button>
-      <input type="file" id="inputImagem" style="display: none" accept="image/*,audio/*" />
+    <div id="usuariosContainer"></div>
+    <form id="form">
+      <input id="mensagem" autocomplete="off" placeholder="Digite uma mensagem..." />
+      <button type="button" id="btnImagem" title="Enviar imagem">&#128247;</button>
+      <input type="file" id="inputImagem" accept="image/*" />
+      <button type="button" id="btnAudio" title="Enviar áudio">&#127908;</button>
+      <button type="button" id="btnToggleUsuarios" title="Mostrar/Ocultar usuários">&#128101;</button>
+      <button type="submit">Enviar</button>
     </form>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
+
+    // Pega parâmetros da URL
     const urlParams = new URLSearchParams(window.location.search);
     const username = urlParams.get("username") || "Anônimo";
+    const nickColor = urlParams.get("color") || "#007bff";
 
     const form = document.getElementById("form");
     const input = document.getElementById("mensagem");
     const chat = document.getElementById("chat");
-    const fontSelect = document.getElementById("fontSelect");
-    const colorSelect = document.getElementById("colorSelect");
     const btnImagem = document.getElementById("btnImagem");
     const inputImagem = document.getElementById("inputImagem");
     const btnToggleUsuarios = document.getElementById("btnToggleUsuarios");
     const usuariosContainer = document.getElementById("usuariosContainer");
     const btnAudio = document.getElementById("btnAudio");
 
-    // Load user font and color preferences
-    fontSelect.value = localStorage.getItem("userFont") || "Inter";
-    colorSelect.value = localStorage.getItem("userColor") || "#ffffff";
+    // Entra na sala
+    socket.emit("entrar", { username, cor: nickColor });
 
-    fontSelect.addEventListener("change", () => {
-      localStorage.setItem("userFont", fontSelect.value);
+    // Atualiza lista de usuários
+    socket.on("usuarios", (lista) => {
+      if (lista.length === 0) {
+        usuariosContainer.innerHTML = "<i>Nenhum usuário online</i>";
+      } else {
+        usuariosContainer.innerHTML = lista.map(u => `<div>${u.username}</div>`).join("");
+      }
     });
 
-    colorSelect.addEventListener("change", () => {
-      localStorage.setItem("userColor", colorSelect.value);
+    // Recebe mensagem
+    socket.on("mensagem", (data) => {
+      const { username: user, texto, cor, imagem, system } = data;
+      const div = document.createElement("div");
+      div.classList.add("msg");
+
+      if (system) {
+        div.style.fontStyle = "italic";
+        div.style.color = "#666";
+        div.textContent = texto;
+      } else {
+        const spanUser = document.createElement("strong");
+        spanUser.className = "username";
+        spanUser.textContent = user;
+        spanUser.style.color = cor || "#000";
+
+        const spanTexto = document.createElement("span");
+        spanTexto.className = "texto";
+        spanTexto.textContent = texto;
+
+        div.appendChild(spanUser);
+        if (texto) div.appendChild(spanTexto);
+        if (imagem) {
+          const img = document.createElement("img");
+          img.src = imagem;
+          img.alt = "Imagem enviada";
+          // Toggle imagem tamanho ao clicar
+          img.addEventListener("click", () => {
+            if (img.style.maxWidth === "100%") {
+              img.style.maxWidth = "150px";
+              img.style.maxHeight = "150px";
+            } else {
+              img.style.maxWidth = "100%";
+              img.style.maxHeight = "auto";
+            }
+          });
+          div.appendChild(img);
+        }
+      }
+
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
     });
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      const texto = input.value.trim();
-      if (!texto) return;
-      const fonte = fontSelect.value;
-      const cor = colorSelect.value;
-      socket.emit("mensagem", { username, texto, fonte, cor });
+      const msg = input.value.trim();
+      if (!msg) return;
+      socket.emit("mensagem", { username, texto: msg, cor: nickColor });
       input.value = "";
     });
 
@@ -235,45 +215,18 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        socket.emit("imagem", { username, imagem: reader.result });
+        socket.emit("imagem", { username, imagem: reader.result, cor: nickColor });
       };
       reader.readAsDataURL(file);
-    });
-
-    btnAudio.addEventListener("click", () => {
-      alert("Função de áudio ainda será implementada.");
+      inputImagem.value = "";
     });
 
     btnToggleUsuarios.addEventListener("click", () => {
       usuariosContainer.classList.toggle("active");
     });
 
-    socket.on("mensagem", ({ username: autor, texto, fonte, cor }) => {
-      const div = document.createElement("div");
-      // Mensagens do próprio usuário com fundo azul claro
-      const isUser = autor === username;
-      div.style.backgroundColor = isUser ? "#d0e7ff" : "transparent";
-      div.style.padding = isUser ? "0.4rem 0.6rem" : "0";
-      div.style.borderRadius = isUser ? "5px" : "0";
-      div.innerHTML = `<strong>${autor}:</strong> <span style="font-family:${fonte}; color:${cor};">${texto}</span>`;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    });
-
-    socket.on("imagem", ({ username: autor, imagem }) => {
-      const div = document.createElement("div");
-      const isUser = autor === username;
-      div.style.backgroundColor = isUser ? "#d0e7ff" : "transparent";
-      div.style.padding = isUser ? "0.4rem 0.6rem" : "0";
-      div.style.borderRadius = isUser ? "5px" : "0";
-      div.innerHTML = `<strong>${autor}:</strong><br><div class="image-container"><img src="${imagem}" alt="imagem enviada" /></div>`;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    });
-
-    socket.on("usuarios", (lista) => {
-      usuariosContainer.innerHTML =
-        "<strong>Usuários online:</strong><br>" + lista.map((u) => `- ${u}`).join("<br>");
+    btnAudio.addEventListener("click", () => {
+      alert("Gravação de áudio ainda não implementada.");
     });
   </script>
 </body>
