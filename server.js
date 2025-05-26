@@ -23,9 +23,12 @@ io.on("connection", socket => {
   });
 
   socket.on("mensagem", data => {
+    // Envia a mensagem com a fonte e a cor escolhida
     io.emit("mensagem", {
       username: data.username,
-      text: data.text
+      text: data.text,
+      fonte: data.fonte,
+      cor: data.cor
     });
   });
 
