@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sala Global</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+    }
+    header {
+      background-color: #2a2a2a;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #chat {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background-color: #121212;
+    }
+    #chat p {
+      margin: 0.5rem 0;
+    }
+    form {
+      display: flex;
+      background-color: #2a2a2a;
+      padding: 1rem;
+    }
+    input {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 4px;
+      margin-right: 1rem;
+    }
+    button {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #4caf50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Sala Global</h2>
+    <span id="usernameLabel"></span>
+  </header>
+
+  <div id="chat"></div>
+
+  <form id="form">
+    <input id="mensagemInput" autocomplete="off" placeholder="Digite sua mensagem..." />
+    <button>Enviar</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const urlParams = new URLSearchParams(window.location.search);
+    const username = urlParams.get('username') || 'Anônimo';
+    document.getElementById('usernameLabel').textContent = `Usuário: ${username}`;
+    const form = document.getElementById('form');
+    const input = document.getElementById('mensagemInput');
+    const chat = document.getElementById('chat');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const mensagem = input.value.trim();
+      if (mensagem) {
+        socket.emit('mensagem', { usuario: username, texto: mensagem });
+        input.value = '';
+      }
+    });
+
+    socket.on('mensagem', (data) => {
+      const p = document.createElement('p');
+      p.innerHTML = `<strong>${data.usuario}:</strong> ${data.texto}`;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    });
+  </script>
+</body>
+</html>
