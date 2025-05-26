@@ -9,7 +9,7 @@
 <body>
   <header>
     <h2>Sala Global</h2>
-    <button id="btnToggleUsuarios" class="btn-usuarios-mobile" aria-label="Mostrar usuários">Usuários</button>
+    <button id="btnToggleUsuarios" class="btn-usuarios-mobile">Usuários</button>
   </header>
 
   <div id="container">
@@ -23,19 +23,18 @@
       <form id="form" autocomplete="off" class="form-chat">
         <input id="mensagem" type="text" placeholder="Digite uma mensagem" autocomplete="off" />
 
-        <!-- Botões de imagem e áudio -->
-        <input type="file" id="inputImagem" accept="image/*" style="display:none" />
-        <button type="button" id="btnImagem" title="Enviar imagem" class="btn-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" viewBox="0 0 24 24" width="24">
-            <path d="M21 19V5c0-1.1-.9-2-2-2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
-          </svg>
-        </button>
+        <div class="icon-buttons">
+          <!-- Botão de enviar imagem -->
+          <input type="file" id="inputImagem" accept="image/*" style="display:none" />
+          <button type="button" id="btnImagem" title="Enviar imagem" class="btn-icon">
+            <img src="https://img.icons8.com/ios-glyphs/30/image.png" alt="imagem" />
+          </button>
 
-        <button type="button" id="btnAudio" title="Gravar áudio" class="btn-icon">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
-            <path d="M12 14a2 2 0 0 0 2-2V6a2 2 0 0 0-4 0v6a2 2 0 0 0 2 2zm4-2a4 4 0 0 1-8 0H6a6 6 0 0 0 12 0h-2zm-4 6v3h2v-3h-2z"/>
-          </svg>
-        </button>
+          <!-- Botão de gravar áudio -->
+          <button type="button" id="btnAudio" title="Gravar áudio" class="btn-icon">
+            <img src="https://img.icons8.com/ios-filled/30/microphone.png" alt="áudio" />
+          </button>
+        </div>
 
         <button type="submit" id="btnEnviar">Enviar</button>
       </form>
