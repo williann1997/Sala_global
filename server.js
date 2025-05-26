@@ -1,77 +1,79 @@
 const express = require("express");
+const http = require("http");
+const path = require("path");
+const socketio = require("socket.io");
 const app = express();
-const http = require("http").createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(http);
+const server = http.createServer(app);
+const io = socketio(server);
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "public")));
 
-let usuarios = new Map(); // socket.id => { username, cor }
+const users = new Map();
+
+function formatTime(date = new Date()) {
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
 
 io.on("connection", (socket) => {
-  console.log(`Usuário conectado: ${socket.id}`);
-
-  socket.on("entrar", (data) => {
-    const { username, cor } = typeof data === "object" ? data : { username: data, cor: "#007bff" };
-    usuarios.set(socket.id, { username, cor });
-    atualizarUsuarios();
-
-    socket.broadcast.emit("mensagem", {
-      system: true,
-      texto: `${username} entrou na sala.`,
-    });
+  socket.on("join", ({ username, color }) => {
+    users.set(socket.id, { username, color });
+    io.emit("users", [...users.values()]);
+    io.emit("systemMessage", `${username} entrou na sala.`);
   });
 
-  socket.on("mensagem", (data) => {
-    const user = usuarios.get(socket.id);
+  socket.on("message", (data) => {
+    const user = users.get(socket.id);
     if (!user) return;
-    const { username, cor } = user;
-    const texto = data.texto || "";
-    if (texto.trim().length === 0) return;
-
-    io.emit("mensagem", {
-      username,
-      texto,
-      cor,
-      system: false,
-    });
+    const timestamp = formatTime();
+    const msgData = {
+      id: generateId(),
+      username: user.username,
+      color: user.color,
+      text: data.text,
+      time: timestamp,
+      reactions: {},
+    };
+    io.emit("message", msgData);
   });
 
-  socket.on("imagem", (data) => {
-    const user = usuarios.get(socket.id);
+  socket.on("fileMessage", (data) => {
+    const user = users.get(socket.id);
     if (!user) return;
-    const { username, cor } = user;
-    if (!data.imagem) return;
+    const timestamp = formatTime();
+    const msgData = {
+      id: generateId(),
+      username: user.username,
+      color: user.color,
+      file: data.file,
+      text: data.text || "",
+      time: timestamp,
+      reactions: {},
+    };
+    io.emit("message", msgData);
+  });
 
-    io.emit("mensagem", {
-      username,
-      imagem: data.imagem,
-      cor,
-      system: false,
-    });
+  socket.on("react", ({ messageId, emoji }) => {
+    io.emit("reactionUpdate", { messageId, emoji, username: users.get(socket.id)?.username });
+  });
+
+  socket.on("deleteMessage", (messageId) => {
+    io.emit("messageDelete", messageId);
   });
 
   socket.on("disconnect", () => {
-    const user = usuarios.get(socket.id);
+    const user = users.get(socket.id);
     if (user) {
-      socket.broadcast.emit("mensagem", {
-        system: true,
-        texto: `${user.username} saiu da sala.`,
-      });
-      usuarios.delete(socket.id);
-      atualizarUsuarios();
+      io.emit("systemMessage", `${user.username} saiu da sala.`);
+      users.delete(socket.id);
+      io.emit("users", [...users.values()]);
     }
-    console.log(`Usuário desconectado: ${socket.id}`);
   });
-
-  function atualizarUsuarios() {
-    // Envia lista de { username, cor }
-    io.emit("usuarios", Array.from(usuarios.values()));
-  }
 });
 
-http.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+function generateId() {
+  return Math.random().toString(36).substring(2, 9);
+}
+
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
