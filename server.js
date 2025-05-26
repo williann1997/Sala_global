@@ -14,55 +14,63 @@ io.on("connection", (socket) => {
   let nomeUsuario = "";
   let corUsuario = "#000000";
 
-  socket.on("entrar", (data) => {
-    nomeUsuario = data.nome || "Anônimo";
-    corUsuario = data.cor || "#000000";
+  socket.on("entrar", (nome) => {
+    nomeUsuario = nome || "Anônimo";
     usuarios[socket.id] = { nome: nomeUsuario, cor: corUsuario };
     atualizarUsuarios();
 
     io.emit("mensagem", {
       username: "Sistema",
       texto: `${nomeUsuario} entrou na sala.`,
-      cor: "#aaaaaa"
+      fonte: "Inter",
+      cor: "#888888"
     });
   });
 
   socket.on("mensagem", (data) => {
-    const { username, texto, cor } = data;
+    const { username, texto, cor, fonte } = data;
+
     if (texto && username) {
-      io.emit("mensagem", { username, texto, cor: cor || "#000000" });
+      usuarios[socket.id] = { nome: username, cor: cor || "#000000" };
+
+      io.emit("mensagem", {
+        username,
+        texto,
+        cor: cor || "#000000",
+        fonte: fonte || "Inter"
+      });
     }
   });
 
   socket.on("imagem", (data) => {
-    const { username, imagem } = data;
-    if (imagem && username) {
-      io.emit("imagem", { username, imagem, cor: corUsuario });
-    }
-  });
+    const { username, imagem, cor } = data;
 
-  socket.on("audio", (data) => {
-    const { username, audio } = data;
-    if (audio && username) {
-      io.emit("audio", { username, audio, cor: corUsuario });
+    if (imagem && username) {
+      io.emit("imagem", {
+        username,
+        imagem,
+        cor: cor || "#000000"
+      });
     }
   });
 
   socket.on("disconnect", () => {
-    if (usuarios[socket.id]) {
+    const usuario = usuarios[socket.id];
+    if (usuario) {
       io.emit("mensagem", {
         username: "Sistema",
-        texto: `${usuarios[socket.id].nome} saiu da sala.`,
-        cor: "#aaaaaa"
+        texto: `${usuario.nome} saiu da sala.`,
+        fonte: "Inter",
+        cor: "#888888"
       });
-
       delete usuarios[socket.id];
       atualizarUsuarios();
     }
   });
 
   function atualizarUsuarios() {
-    io.emit("usuarios", Object.values(usuarios));
+    const nomes = Object.values(usuarios).map((u) => u.nome);
+    io.emit("usuarios", nomes);
   }
 });
 
