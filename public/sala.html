@@ -1,385 +1,422 @@
-<!DOCTYPE html><html lang="pt-BR">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sala Global</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Inter', sans-serif<!DOCTYPE html><html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sala Global</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
-  <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sala Global</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+  /* Reset básico */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+
+  body {
+    background: #121212 url('https://www.transparenttextures.com/patterns/dark-mosaic.png') repeat;
+    color: #eee;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    background: rgba(40, 40, 40, 0.85);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.8);
+    user-select: none;
+  }
+
+  header h1 {
+    font-weight: 700;
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+  }
+
+  #btnToggleUsers {
+    display: none;
+    background: transparent;
+    border: none;
+    font-size: 1.6rem;
+    color: #8af;
+    cursor: pointer;
+  }
+
+  #userList {
+    background: rgba(30,30,30,0.9);
+    width: 220px;
+    overflow-y: auto;
+    border-left: 3px solid #5577cc;
+    transition: transform 0.3s ease;
+  }
+
+  #userList h2 {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #5577cc;
+    color: #aaf;
+  }
+
+  #userList ul {
+    list-style: none;
+    padding: 0 1rem 1rem;
+  }
+
+  #userList ul li {
+    padding: 0.5rem 0;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #cce;
+    transition: background-color 0.2s ease;
+  }
+
+  #userList ul li:hover {
+    background-color: #5577cc;
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    background: #1e1e1e;
+  }
+
+  #chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    color: #222;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .msg {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    background: #e8e8e8;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+    position: relative;
+  }
+
+  .msg strong.username {
+    color: #336699;
+    cursor: pointer;
+  }
+
+  .msg .text {
+    margin-top: 0.25rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  .msg img {
+    max-width: 250px;
+    max-height: 200px;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .msg img:hover {
+    box-shadow: 0 0 15px #5577cc;
+  }
+
+  .msg audio {
+    margin-top: 0.5rem;
+    width: 100%;
+    outline: none;
+  }
+
+  #formMsg {
+    background: #2a2a2a;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  #inputMsg {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    background: #444;
+    color: #eee;
+  }
+
+  button {
+    background: #5577cc;
+    border: none;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: #3355aa;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  #btnSend {
+    flex-shrink: 0;
+  }
+
+  #btnSendImage,
+  #btnRecordAudio {
+    background: transparent;
+    color: #88aaff;
+    font-size: 1.5rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  #btnSendImage:hover,
+  #btnRecordAudio:hover {
+    background: #3355aa;
+    color: white;
+  }
+
+  #fileImage {
+    display: none;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
     body {
+      overflow: hidden;
+    }
+    #userList {
+      position: fixed;
+      top: 0;
+      right: 0;
       height: 100vh;
-      display: flex;
-      background: linear-gradient(135deg, #1e1e2f, #111118);
-      background-image: url('https://www.transparenttextures.com/patterns/rocky-wall.png');
-      color: white;
+      width: 220px;
+      transform: translateX(100%);
+      z-index: 20;
+      box-shadow: -3px 0 8px rgba(0,0,0,0.6);
     }
-    #sidebar {
-      width: 250px;
-      background-color: #2a2a3a;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      overflow-y: auto;
+
+    #userList.show {
+      transform: translateX(0);
     }
-    #sidebar h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+
+    #btnToggleUsers {
+      display: block;
     }
-    .user {
-      cursor: pointer;
-      padding: 0.4rem;
-      border-radius: 6px;
-      background: #383848;
-      transition: background 0.2s;
-    }
-    .user:hover {
-      background: #4b4b60;
-    }
-    #main {
-      flex: 1;
-      display: flex;
+
+    main {
       flex-direction: column;
     }
+
     #chat {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      background-color: #f4f4f4;
-      color: #1e1e2f;
-    }
-    #chat .msg {
-      margin-bottom: 0.8rem;
-    }
-    #chat .msg strong {
-      color: #2a8;
-    }
-    #input-area {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: #1a1a26;
-      align-items: center;
-    }
-    #input-area input[type="text"] {
-      flex: 1;
+      height: calc(100vh - 56px);
       padding: 0.75rem;
-      border-radius: 8px;
-      border: none;
-      background: #2e2e3d;
-      color: white;
     }
-    #input-area button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: white;
-      font-size: 1.2rem;
-    }
-    #input-area input[type="file"] {
-      display: none;
-    }
-    #mobile-toggle, #close-sidebar {
-      display: none;
-    }
-    @media (max-width: 768px) {
-      #sidebar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        z-index: 10;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-      }
-      #sidebar.active {
-        transform: translateX(0);
-      }
-      #mobile-toggle, #close-sidebar {
-        display: block;
-        position: absolute;
-        top: 1rem;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        z-index: 11;
-      }
-      #mobile-toggle {
-        left: 1rem;
-      }
-      #close-sidebar {
-        left: 210px;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <button id="mobile-toggle">☰</button>
-  <aside id="sidebar">
-    <button id="close-sidebar">✕</button>
+<header>
+  <h1>Sala Global</h1>
+  <button id="btnToggleUsers" title="Mostrar/Ocultar usuários">&#9776;</button>
+</header>
+<main>
+  <section id="chat" aria-label="Mural de mensagens">
+    <div id="messages" aria-live="polite" aria-relevant="additions"></div>
+    <form id="formMsg">
+      <input id="inputMsg" autocomplete="off" placeholder="Digite uma mensagem..." aria-label="Mensagem" />
+      <button type="button" id="btnSendImage" title="Enviar imagem" aria-label="Enviar imagem">&#128247;</button>
+      <input type="file" id="fileImage" accept="image/*" />
+      <button type="button" id="btnRecordAudio" title="Gravar áudio (até 1 minuto)" aria-label="Gravar áudio">&#127908;</button>
+      <button type="submit" id="btnSend" disabled>Enviar</button>
+    </form>
+  </section>
+
+  <aside id="userList" aria-label="Lista de usuários online">
     <h2>Usuários Online</h2>
-    <div id="users"></div>
-  </aside>  <main id="main">
-    <div id="chat"></div>
-    <div id="input-area">
-      <input type="text" id="msgInput" placeholder="Digite uma mensagem..." />
-      <input type="file" id="imgInput" accept="image/*" />
-      <label for="imgInput" title="Enviar imagem">🖼️</label>
-      <button id="micBtn" title="Gravar áudio">🎤</button>
-      <button id="sendBtn" title="Enviar">➤</button>
-    </div>
-  </main>  <script src="/socket.io/socket.io.js"></script>  <script>
-    const socket = io();
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username') || 'Anônimo';
-    const chat = document.getElementById('chat');
-    const usersDiv = document.getElementById('users');
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const imgInput = document.getElementById('imgInput');
-    const micBtn = document.getElementById('micBtn');
-    const mobileToggle = document.getElementById('mobile-toggle');
-    const closeSidebar = document.getElementById('close-sidebar');
+    <ul></ul>
+  </aside>
+</main>
 
-    socket.emit('join', username);
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
 
-    socket.on('updateUsers', users => {
-      usersDiv.innerHTML = '';
-      users.forEach(user => {
-        const div = document.createElement('div');
-        div.className = 'user';
-        div.textContent = user;
-        div.onclick = () => {
-          msgInput.value += `@${user} `;
-          msgInput.focus();
-        };
-        usersDiv.appendChild(div);
-      });
-;
-    }
-    body {
-      height: 100vh;
-      display: flex;
-      background: linear-gradient(135deg, #1e1e2f, #111118);
-      background-image: url('https://www.transparenttextures.com/patterns/rocky-wall.png');
-      color: white;
-    }
-    #sidebar {
-      width: 250px;
-      background-color: #2a2a3a;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      overflow-y: auto;
-    }
-    #sidebar h2 {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
-    .user {
-      cursor: pointer;
-      padding: 0.4rem;
-      border-radius: 6px;
-      background: #383848;
-      transition: background 0.2s;
-    }
-    .user:hover {
-      background: #4b4b60;
-    }
-    #main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    #chat {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      background-color: #f4f4f4;
-      color: #1e1e2f;
-    }
-    #chat .msg {
-      margin-bottom: 0.8rem;
-    }
-    #chat .msg strong {
-      color: #2a8;
-    }
-    #input-area {
-      display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
-      background: #1a1a26;
-      align-items: center;
-    }
-    #input-area input[type="text"] {
-      flex: 1;
-      padding: 0.75rem;
-      border-radius: 8px;
-      border: none;
-      background: #2e2e3d;
-      color: white;
-    }
-    #input-area button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: white;
-      font-size: 1.2rem;
-    }
-    #input-area input[type="file"] {
-      display: none;
-    }
-    #mobile-toggle, #close-sidebar {
-      display: none;
-    }
-    @media (max-width: 768px) {
-      #sidebar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        z-index: 10;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-      }
-      #sidebar.active {
-        transform: translateX(0);
-      }
-      #mobile-toggle, #close-sidebar {
-        display: block;
-        position: absolute;
-        top: 1rem;
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5rem;
-        z-index: 11;
-      }
-      #mobile-toggle {
-        left: 1rem;
-      }
-      #close-sidebar {
-        left: 210px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <button id="mobile-toggle">☰</button>
-  <aside id="sidebar">
-    <button id="close-sidebar">✕</button>
-    <h2>Usuários Online</h2>
-    <div id="users"></div>
-  </aside>  <main id="main">
-    <div id="chat"></div>
-    <div id="input-area">
-      <input type="text" id="msgInput" placeholder="Digite uma mensagem..." />
-      <input type="file" id="imgInput" accept="image/*" />
-      <label for="imgInput" title="Enviar imagem">🖼️</label>
-      <button id="micBtn" title="Gravar áudio">🎤</button>
-      <button id="sendBtn" title="Enviar">➤</button>
-    </div>
-  </main>  <script src="/socket.io/socket.io.js"></script>  <script>
-    const socket = io();
-    const urlParams = new URLSearchParams(window.location.search);
-    const username = urlParams.get('username') || 'Anônimo';
-    const chat = document.getElementById('chat');
-    const usersDiv = document.getElementById('users');
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const imgInput = document.getElementById('imgInput');
-    const micBtn = document.getElementById('micBtn');
-    const mobileToggle = document.getElementById('mobile-toggle');
-    const closeSidebar = document.getElementById('close-sidebar');
+  // Pegando elementos DOM
+  const messagesEl = document.getElementById('messages');
+  const formMsg = document.getElementById('formMsg');
+  const inputMsg = document.getElementById('inputMsg');
+  const btnSend = document.getElementById('btnSend');
+  const btnSendImage = document.getElementById('btnSendImage');
+  const fileImage = document.getElementById('fileImage');
+  const btnRecordAudio = document.getElementById('btnRecordAudio');
+  const userListEl = document.querySelector('#userList ul');
+  const userListContainer = document.getElementById('userList');
+  const btnToggleUsers = document.getElementById('btnToggleUsers');
 
-    socket.emit('join', username);
+  // Variáveis de estado
+  let username = null;
+  let recording = false;
+  let mediaRecorder;
+  let audioChunks = [];
 
-    socket.on('updateUsers', users => {
-      usersDiv.innerHTML = '';
-      users.forEach(user => {
-        const div = document.createElement('div');
-        div.className = 'user';
-        div.textContent = user;
-        div.onclick = () => {
-          msgInput.value += `@${user} `;
-          msgInput.focus();
-        };
-        usersDiv.appendChild(div);
-      });
+  // Pega o nome no query string
+  const urlParams = new URLSearchParams(window.location.search);
+  username = urlParams.get('username');
+  if (!username) {
+    alert('Nome de usuário não informado!');
+    window.location.href = '/';
+  }
+
+  // Avisar server que entrou com username
+  socket.emit('join', username);
+
+  // Habilitar botão enviar se digitar algo
+  inputMsg.addEventListener('input', () => {
+    btnSend.disabled = inputMsg.value.trim().length === 0;
+  });
+
+  // Função para criar mensagem no mural
+  function addMessage({username: user, text, image, audio}) {
+    const msgEl = document.createElement('div');
+    msgEl.classList.add('msg');
+
+    // Nome do usuário clicável para mencionar
+    const userNameEl = document.createElement('strong');
+    userNameEl.classList.add('username');
+    userNameEl.textContent = user;
+    userNameEl.title = 'Clique para mencionar';
+    userNameEl.addEventListener('click', () => {
+      inputMsg.value += `@${user} `;
+      inputMsg.focus();
+      btnSend.disabled = false;
     });
+    msgEl.appendChild(userNameEl);
 
-    socket.on('mensagem', data => {
-      const msg = document.createElement('div');
-      msg.className = 'msg';
-      if (data.img) {
-        msg.innerHTML = `<strong>${data.user}:</strong><br><img src="${data.img}" alt="imagem" style="max-width:200px;border-radius:10px;cursor:pointer;" onclick="window.open('${data.img}', '_blank')" />`;
-      } else if (data.audio) {
-        msg.innerHTML = `<strong>${data.user}:</strong><br><audio controls src="${data.audio}"></audio>`;
-      } else {
-        msg.innerHTML = `<strong>${data.user}:</strong> ${data.text}`;
-      }
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
+    if (text) {
+      const textEl = document.createElement('div');
+      textEl.classList.add('text');
+      textEl.textContent = text;
+      msgEl.appendChild(textEl);
+    }
+
+    if (image) {
+      // Imagem com botão ver/ocultar
+      const imgWrapper = document.createElement('div');
+      imgWrapper.style.position = 'relative';
+
+      const imgEl = document.createElement('img');
+      imgEl.src = image;
+      imgEl.alt = 'Imagem enviada';
+      imgEl.style.display = 'none'; // inicialmente oculta
+
+      const btnToggleImg = document.createElement('button');
+      btnToggleImg.textContent = 'Mostrar imagem';
+      btnToggleImg.style.marginTop = '0.5rem';
+      btnToggleImg.style.cursor = 'pointer';
+      btnToggleImg.style.border = 'none';
+      btnToggleImg.style.background = '#5577cc';
+      btnToggleImg.style.color = '#fff';
+      btnToggleImg.style.borderRadius = '6px';
+      btnToggleImg.style.padding = '0.3rem 0.6rem';
+      btnToggleImg.addEventListener('click', () => {
+        if (imgEl.style.display === 'none') {
+          imgEl.style.display = 'block';
+          btnToggleImg.textContent = 'Ocultar imagem';
+        } else {
+          imgEl.style.display = 'none';
+          btnToggleImg.textContent = 'Mostrar imagem';
+        }
+      });
+
+      imgWrapper.appendChild(btnToggleImg);
+      imgWrapper.appendChild(imgEl);
+      msgEl.appendChild(imgWrapper);
+    }
+
+    if (audio) {
+      const audioEl = document.createElement('audio');
+      audioEl.controls = true;
+      audioEl.src = audio;
+      msgEl.appendChild(audioEl);
+    }
+
+    messagesEl.appendChild(msgEl);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // Atualiza a lista de usuários
+  socket.on('userList', users => {
+    userListEl.innerHTML = '';
+    users.forEach(user => {
+      const li = document.createElement('li');
+      li.textContent = user;
+      li.title = 'Clique para mencionar';
+      li.addEventListener('click', () => {
+        inputMsg.value += `@${user} `;
+        inputMsg.focus();
+        btnSend.disabled = false;
+      });
+      userListEl.appendChild(li);
     });
+  });
 
-    sendBtn.onclick = () => {
-      const text = msgInput.value.trim();
-      if (text) {
-        socket.emit('mensagem', { user: username, text });
-        msgInput.value = '';
-      }
-    };
+  // Recebe mensagens
+  socket.on('message', msg => {
+    addMessage(msg);
+  });
 
-    imgInput.onchange = () => {
-      const file = imgInput.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          socket.emit('mensagem', { user: username, img: reader.result });
-        };
-        reader.readAsDataURL(file);
-      }
-    };
+  // Enviar mensagem texto
+  formMsg.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = inputMsg.value.trim();
+    if (!text) return;
+    socket.emit('message', {username, text});
+    inputMsg.value = '';
+    btnSend.disabled = true;
+  });
 
-    let mediaRecorder, audioChunks = [];
+  // Botão toggle lista usuários mobile
+  btnToggleUsers.addEventListener('click', () => {
+    userListContainer.classList.toggle('show');
+  });
 
-    micBtn.onclick = async () => {
-      if (!navigator.mediaDevices) return alert('Gravação não suportada');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
+  // Upload e envio de imagem
+  btnSendImage.addEventListener('click', () => {
+    fileImage.click();
+  });
 
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-        const reader = new FileReader();
-        reader.onload = () => {
-          socket.emit('mensagem', { user: username, audio: reader.result });
-        };
-        reader.readAsDataURL(blob);
-      };
-
-      mediaRecorder.start();
-      setTimeout(() => mediaRecorder.stop(), 60000);
-      micBtn.textContent = '⏺️ Gravando...';
-      setTimeout(() => micBtn.textContent = '🎤', 60000);
-    };
-
-    mobileToggle.onclick = () => document.getElementById('sidebar').classList.add('active');
-    closeSidebar.onclick = () => document.getElementById('sidebar').classList.remove('active');
-  </script></body>
-</html>
+  fileImage.addEventListener('change', () => {
+    const file = fileImage.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const imageData = e
