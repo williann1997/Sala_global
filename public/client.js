@@ -13,36 +13,8 @@ const usuariosContainer = document.getElementById("usuariosContainer");
 const listaUsuarios = document.getElementById("listaUsuarios");
 const btnAudio = document.getElementById("btnAudio");
 
-// Envia nome para o servidor ao conectar
 socket.emit("entrar", username);
 
-// Enviar mensagem de texto
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  if (input.value.trim()) {
-    socket.emit("mensagem", {
-      username,
-      texto: input.value,
-      cor,
-const socket = io();
-const urlParams = new URLSearchParams(window.location.search);
-const username = urlParams.get("username") || "Anônimo";
-const cor = urlParams.get("cor") || "#000000";
-
-const form = document.getElementById("form");
-const input = document.getElementById("mensagem");
-const chat = document.getElementById("chat");
-const btnImagem = document.getElementById("btnImagem");
-const inputImagem = document.getElementById("inputImagem");
-const btnToggleUsuarios = document.getElementById("btnToggleUsuarios");
-const usuariosContainer = document.getElementById("usuariosContainer");
-const listaUsuarios = document.getElementById("listaUsuarios");
-const btnAudio = document.getElementById("btnAudio");
-
-// Envia nome para o servidor ao conectar
-socket.emit("entrar", username);
-
-// Enviar mensagem de texto
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   if (input.value.trim()) {
@@ -56,10 +28,8 @@ form.addEventListener("submit", (e) => {
   }
 });
 
-// Receber mensagem do servidor
 socket.on("mensagem", (data) => {
   const { username: nome, texto, cor: corTexto, fonte } = data;
-
   const msg = document.createElement("div");
   msg.className = "mensagem";
 
@@ -67,14 +37,13 @@ socket.on("mensagem", (data) => {
 
   msg.innerHTML = `
     <strong style="color: ${corTexto}; font-family: ${fonte};">${nome}</strong>:
-    <span style="color: ${isMention ? '#ffff00' : '#000'}">${texto}</span>
+    <span style="color: ${isMention ? '#ADD8E6' : '#000000'}">${texto}</span>
   `;
 
   chat.appendChild(msg);
   chat.scrollTop = chat.scrollHeight;
 });
 
-// Enviar imagem
 btnImagem.addEventListener("click", () => {
   inputImagem.click();
 });
@@ -90,7 +59,6 @@ inputImagem.addEventListener("change", () => {
   }
 });
 
-// Receber imagem
 socket.on("imagem", (data) => {
   const div = document.createElement("div");
   div.className = "mensagem imagem-msg";
@@ -108,7 +76,6 @@ socket.on("imagem", (data) => {
   chat.scrollTop = chat.scrollHeight;
 });
 
-// Atualizar lista de usuários online
 socket.on("usuarios", (lista) => {
   listaUsuarios.innerHTML = "";
   lista.forEach((nome) => {
@@ -118,12 +85,10 @@ socket.on("usuarios", (lista) => {
   });
 });
 
-// Alternar exibição da lista de usuários
 btnToggleUsuarios.addEventListener("click", () => {
   usuariosContainer.classList.toggle("active");
 });
 
-// Áudio (ainda será implementado)
 btnAudio.addEventListener("click", () => {
   alert("Função de áudio ainda em desenvolvimento.");
-});￼Enter
+});
